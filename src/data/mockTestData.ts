@@ -1,5 +1,16 @@
 
-export const mockTestData = [
+interface TestResult {
+  id: string;
+  name: string;
+  status: 'passed' | 'failed' | 'flaky';
+  duration: string;
+  timestamp: string;
+  framework: string;
+  browser: string;
+  errorMessage?: string;
+}
+
+export const mockTestData: TestResult[] = [
   {
     id: '1',
     name: 'User Login Authentication',

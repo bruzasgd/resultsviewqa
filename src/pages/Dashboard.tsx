@@ -35,6 +35,37 @@ const Dashboard = () => {
     }
   };
 
+  // Calculate metrics and trends
+  const calculateMetrics = () => {
+    const currentPassRate = testResults.length > 0
+      ? Math.round((testResults.filter(test => test.status === 'passed').length / testResults.length) * 100)
+      : 0;
+
+    const failedTests = testResults.filter(test => test.status === 'failed').length;
+    const previousFailedTests = testResults.slice(0, -5).filter(test => test.status === 'failed').length;
+    const failedTrend = failedTests > previousFailedTests ? 'up' : 'down';
+    
+    const totalDuration = testResults.reduce((total, test) => {
+      const duration = parseFloat(test.duration.replace('s', ''));
+      return total + (isNaN(duration) ? 0 : duration);
+    }, 0);
+    
+    const flakyTests = testResults.filter(test => test.status === 'flaky').length;
+    const previousFlakyTests = testResults.slice(0, -5).filter(test => test.status === 'flaky').length;
+    const flakyTrend = flakyTests > previousFlakyTests ? 'up' : 'down';
+
+    return {
+      passRate: currentPassRate,
+      failedTests,
+      totalDuration,
+      flakyTests,
+      failedTrend,
+      flakyTrend
+    };
+  };
+
+  const metrics = calculateMetrics();
+
   // Calculate metrics
   const passRate = testResults.length > 0
     ? Math.round((testResults.filter(test => test.status === 'passed').length / testResults.length) * 100)
@@ -98,36 +129,41 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8">
-      <DashboardHeader
-        title="Test Automation Dashboard"
-        description="Monitor your automated test executions and quality metrics"
-      />
+      <DashboardHeader title="Test Automation Dashboard" description="Monitor your automated test executions and quality metrics" />
       
       {/* Metrics Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardMetricCard
           title="Pass Rate"
-          value={`${passRate}%`}
+          value={`${metrics.passRate}%`}
           description="Tests passing successfully"
           icon={<Check className="text-green-500" />}
+          trend="vs last run"
+          trendDirection={metrics.passRate > 80 ? 'up' : 'down'}
         />
         <DashboardMetricCard
           title="Failed Tests"
-          value={failedTests.toString()}
+          value={metrics.failedTests.toString()}
           description="Tests that didn't pass"
           icon={<X className="text-red-500" />}
+          trend="vs last run"
+          trendDirection={metrics.failedTrend}
         />
         <DashboardMetricCard
           title="Execution Time"
-          value={`${totalDuration.toFixed(2)}s`}
+          value={`${metrics.totalDuration.toFixed(2)}s`}
           description="Total test execution time"
           icon={<Clock className="text-blue-500" />}
+          trend="Average duration"
+          trendDirection="neutral"
         />
         <DashboardMetricCard
           title="Flaky Tests"
-          value={flakyTests.toString()}
+          value={metrics.flakyTests.toString()}
           description="Tests with inconsistent results"
           icon={<AlertTriangle className="text-amber-500" />}
+          trend="vs last run"
+          trendDirection={metrics.flakyTrend}
         />
       </div>
 
@@ -254,16 +290,13 @@ const Dashboard = () => {
                 colors={{ scheme: "category10" }}
                 borderWidth={1}
                 borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-                radialLabelsSkipAngle={10}
-                radialLabelsTextXOffset={6}
-                radialLabelsTextColor="#333333"
-                radialLabelsLinkOffset={0}
-                radialLabelsLinkDiagonalLength={16}
-                radialLabelsLinkHorizontalLength={24}
-                radialLabelsLinkStrokeWidth={1}
-                radialLabelsLinkColor={{ from: "color" }}
-                slicesLabelsSkipAngle={10}
-                slicesLabelsTextColor="#333333"
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor="#333333"
+                arcLinkLabelsOffset={0}
+                arcLinkLabelsTextColor="#333333"
+                arcLinkLabelsDiagonalLength={16}
+                arcLinkLabelsThickness={2}
+                arcLinkLabelsColor={{ from: "color" }}
                 animate={true}
                 legends={[
                   {

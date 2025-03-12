@@ -1,25 +1,35 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { ReactNode } from "react";
 
 interface DashboardMetricCardProps {
   title: string;
   value: string;
-  trend: string;
-  icon: ReactNode;
   description: string;
-  trendDirection: 'up' | 'down';
+  icon: ReactNode;
+  trend?: string;
+  trendDirection?: 'up' | 'down' | 'neutral';
 }
 
 export const DashboardMetricCard = ({ 
   title, 
   value, 
-  trend, 
   icon, 
   description,
-  trendDirection
+  trend,
+  trendDirection = 'neutral'
 }: DashboardMetricCardProps) => {
+  const getTrendColor = () => {
+    switch (trendDirection) {
+      case 'up':
+        return 'text-green-500';
+      case 'down':
+        return 'text-red-500';
+      default:
+        return 'text-gray-500';
+    }
+  };
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -31,18 +41,11 @@ export const DashboardMetricCard = ({
           <div className="p-2 rounded-full bg-muted">{icon}</div>
         </div>
         <div className="flex items-center mt-4">
-          <div className={`flex items-center ${
-            trendDirection === 'up' 
-              ? 'text-green-500' 
-              : 'text-red-500'
-          }`}>
-            {trendDirection === 'up' ? (
-              <TrendingUp className="h-4 w-4 mr-1" />
-            ) : (
-              <TrendingDown className="h-4 w-4 mr-1" />
-            )}
-            <span className="text-sm font-medium">{trend}</span>
-          </div>
+          {trend && (
+            <span className={`text-sm font-medium ${getTrendColor()}`}>
+              {trend}
+            </span>
+          )}
           <span className="text-sm text-muted-foreground ml-2">{description}</span>
         </div>
       </CardContent>

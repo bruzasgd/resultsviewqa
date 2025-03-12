@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ReactNode } from "react";
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 interface DashboardMetricCardProps {
   title: string;
@@ -30,8 +31,19 @@ export const DashboardMetricCard = ({
     }
   };
 
+  const getTrendIcon = () => {
+    switch (trendDirection) {
+      case 'up':
+        return <ArrowUp className="h-3 w-3 text-green-500" />;
+      case 'down':
+        return <ArrowDown className="h-3 w-3 text-red-500" />;
+      default:
+        return <Minus className="h-3 w-3 text-gray-500" />;
+    }
+  };
+
   return (
-    <Card>
+    <Card className="transition-all hover:shadow-md">
       <CardContent className="pt-6">
         <div className="flex justify-between items-start">
           <div>
@@ -42,8 +54,9 @@ export const DashboardMetricCard = ({
         </div>
         <div className="flex items-center mt-4">
           {trend && (
-            <span className={`text-sm font-medium ${getTrendColor()}`}>
-              {trend}
+            <span className={`text-sm font-medium ${getTrendColor()} flex items-center`}>
+              {getTrendIcon()}
+              <span className="ml-1">{trend}</span>
             </span>
           )}
           <span className="text-sm text-muted-foreground ml-2">{description}</span>

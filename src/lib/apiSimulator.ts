@@ -3,8 +3,18 @@ import { ParsedTestResult } from "./xmlParser";
 
 // API endpoint URLs (simulation)
 export const API_ENDPOINTS = {
+  // Endpoint for uploading test reports in XML format
   UPLOAD_TEST_REPORT: '/api/test-reports',
+  // Endpoint for retrieving all test results
   GET_TEST_RESULTS: '/api/test-results'
+};
+
+// Common error messages for better error handling
+export const ERROR_MESSAGES = {
+  UPLOAD_FAILED: 'Failed to upload test report. Please check your XML format and try again.',
+  FETCH_FAILED: 'Failed to fetch test results. Please try again later.',
+  INVALID_XML: 'Invalid XML format. Please check your test report structure.',
+  NETWORK_ERROR: 'Network error occurred. Please check your internet connection.'
 };
 
 // Simulate API response structure
@@ -14,53 +24,67 @@ interface ApiResponse<T> {
   error?: string;
 }
 
-// Simulated API call for uploading test report
+/**
+ * Simulated API call for uploading test reports
+ * @param xmlData - The XML string containing test results
+ * @returns Promise with upload response
+ */
 export const uploadTestReportAPI = async (
   xmlData: string
 ): Promise<ApiResponse<{ results: ParsedTestResult[] }>> => {
-  // In a real app, this would be a fetch call to a backend API
-  console.log('API call: uploading XML test report');
+  console.log('📤 Uploading test report...');
   
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+  // Simulate basic XML validation
+  if (!xmlData.includes('<?xml')) {
+    return {
+      success: false,
+      error: ERROR_MESSAGES.INVALID_XML
+    };
+  }
+
   try {
-    // We're simulating a successful API response
+    // Simulate network delay (500ms)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simulate successful upload
     return {
       success: true,
       data: {
-        results: [] // The actual results are processed client-side for this demo
+        results: [] // Results are processed client-side in this demo
       }
     };
   } catch (error) {
+    console.error('❌ Upload failed:', error);
     return {
       success: false,
-      error: 'Failed to upload test report'
+      error: ERROR_MESSAGES.UPLOAD_FAILED
     };
   }
 };
 
-// Simulated API call for getting test results
+/**
+ * Simulated API call for retrieving test results
+ * @returns Promise with test results response
+ */
 export const getTestResultsAPI = async (): Promise<ApiResponse<{ results: ParsedTestResult[] }>> => {
-  // In a real app, this would be a fetch call to a backend API
-  console.log('API call: getting test results');
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
+  console.log('📥 Fetching test results...');
   
   try {
-    // We're simulating a successful API response
-    // In a real app, this would return data from a database
+    // Simulate network delay (300ms)
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Simulate successful response
     return {
       success: true,
       data: {
-        results: [] // The actual results are handled in the service for this demo
+        results: [] // Results are handled in the service layer
       }
     };
   } catch (error) {
+    console.error('❌ Fetch failed:', error);
     return {
       success: false,
-      error: 'Failed to fetch test results'
+      error: ERROR_MESSAGES.FETCH_FAILED
     };
   }
 };

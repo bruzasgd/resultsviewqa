@@ -5,8 +5,9 @@ import { MetricsRow } from "@/components/dashboard/MetricsRow";
 import { ChartsRow } from "@/components/dashboard/ChartsRow";
 import { ChartsSecondRow } from "@/components/dashboard/ChartsSecondRow";
 import { TestResultsTabs } from "@/components/dashboard/TestResultsTabs";
+import { ApiDocumentation } from "@/components/dashboard/ApiDocumentation";
 import { mockTestData } from "@/data/mockTestData";
-import { getAllTestResults, initializeWithMockData } from "@/services/testReportService";
+import { getAllTestResults, initializeWithMockData, subscribeToTestResults } from "@/services/testReportService";
 import { ParsedTestResult } from "@/lib/xmlParser";
 
 const Dashboard = () => {
@@ -17,6 +18,15 @@ const Dashboard = () => {
     // Initialize with mock data
     initializeWithMockData(mockTestData);
     refreshTestResults();
+
+    // Subscribe to test result changes
+    const unsubscribe = subscribeToTestResults(() => {
+      refreshTestResults();
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const refreshTestResults = async () => {
@@ -68,15 +78,18 @@ const Dashboard = () => {
         title="Test Automation Dashboard" 
         description="Monitor your automated test executions and quality metrics" 
         onRefresh={refreshTestResults}
+        onReportUploaded={refreshTestResults}
       />
       
       <MetricsRow {...metrics} />
       
-      <ChartsRow testResults={testResults} onReportUploaded={refreshTestResults} />
+      <ChartsRow testResults={testResults} />
       
       <ChartsSecondRow testResults={testResults} />
 
       <TestResultsTabs testResults={testResults} />
+
+      <ApiDocumentation />
     </div>
   );
 };

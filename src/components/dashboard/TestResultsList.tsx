@@ -119,7 +119,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                   {test.errorMessage && (
                     <div className="col-span-2">
                       <p className="font-medium">Error Message</p>
-                      <p className="text-red-600 mt-1 p-2 bg-red-50 rounded border border-red-100 overflow-x-auto">
+                      <p className="text-red-600 mt-1 p-2 bg-red-50 rounded border border-red-100 overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap">
                         {test.errorMessage}
                       </p>
                     </div>

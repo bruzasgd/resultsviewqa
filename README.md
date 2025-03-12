@@ -1,69 +1,91 @@
-# Welcome to your Lovable project
+# Test Results Visualization Dashboard
 
-## Project info
+A modern web application for visualizing and analyzing test results from various testing frameworks. This dashboard provides insights into test execution results, helping teams identify patterns, track success rates, and manage test reports effectively.
 
-**URL**: https://lovable.dev/projects/3d2d82ff-00af-4208-9c89-508ac9ca3294
+## Features
 
-## How can I edit this code?
+- 📊 Interactive charts and visualizations
+- 🔄 Real-time test result parsing
+- 🎭 Support for Playwright and Cypress test reports
+- 📱 Responsive design for desktop and mobile
+- 📈 Test analytics and insights
+- 🔍 Detailed test case information
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3d2d82ff-00af-4208-9c89-508ac9ca3294) and start prompting.
+- Node.js (Latest LTS version recommended)
+- npm (comes with Node.js)
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+1. Clone the repository:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone <repository-url>
+cd resultsviewqa
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```sh
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at http://localhost:8081
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Usage
 
-**Use GitHub Codespaces**
+### Uploading Test Reports
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The dashboard accepts XML test reports from:
+- Playwright
+- Cypress
+- Other JUnit-compatible test frameworks
 
-## What technologies are used for this project?
+Test reports should follow the standard XML format with test suites and test cases. The system automatically detects the testing framework and parses the results accordingly.
 
-This project is built with .
+### Supported XML Format
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Your XML test report should include:
+- `<testsuites>` as the root element
+- Individual `<testsuite>` elements
+- `<testcase>` elements with attributes:
+  - `name`: Test case name
+  - `time`: Test duration
+  - `status`: Test status
+  - Optional `failure` or `error` elements for failed tests
 
-## How can I deploy this project?
+### Analyzing Results
 
-Simply open [Lovable](https://lovable.dev/projects/3d2d82ff-00af-4208-9c89-508ac9ca3294) and click on Share -> Publish.
+The dashboard provides:
+1. Success rate visualization
+2. Test execution duration analysis
+3. Failure patterns identification
+4. Browser and framework-specific insights
+5. Detailed error messages for failed tests
 
-## I want to use a custom domain - is that possible?
+## API Documentation
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+The application provides RESTful APIs for managing test results:
+
+- `GET /api/results` - Retrieve test results
+- `POST /api/upload` - Upload new test reports
+
+For detailed API documentation, visit the API Documentation section in the dashboard.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the repository or contact the development team.

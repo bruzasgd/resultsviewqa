@@ -36,7 +36,7 @@ export const UploadHistory = ({ uploads }: UploadHistoryProps) => {
           <div className="space-y-3">
             {uploads.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
-                No upload history available
+                No upload history
               </div>
             ) : (
               uploads.map((upload) => (

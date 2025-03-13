@@ -1,4 +1,3 @@
-
 import { ParsedTestResult } from "./xmlParser";
 
 // API endpoint URLs (simulation)
@@ -34,12 +33,10 @@ export const uploadTestReportAPI = async (
 ): Promise<ApiResponse<{ results: ParsedTestResult[] }>> => {
   console.log('📤 Uploading test report...');
   
-  // Simulate basic XML validation
-  if (!xmlData.includes('<?xml')) {
-    return {
-      success: false,
-      error: ERROR_MESSAGES.INVALID_XML
-    };
+  // Removed strict XML validation to better support Playwright reports
+  // Basic check to ensure it's an XML file
+  if (!xmlData.includes('<test') && !xmlData.includes('<testsuite')) {
+    console.warn('XML validation: Missing test elements, but proceeding anyway');
   }
 
   try {

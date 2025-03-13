@@ -32,14 +32,15 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
   try {
     console.log("Starting to process XML file upload", { filenameProvided: !!filename });
     
-    // Basic format validation
+    // Very basic format validation - more lenient for Playwright
     if (!xmlString || !xmlString.trim()) {
       throw new Error("Empty test report provided");
     }
 
-    // More lenient validation
-    if (!xmlString.includes('<test')) {
-      console.warn("XML may not be in expected format - doesn't contain test elements");
+    // Relax validation to support more formats
+    // Just a basic check to ensure it at least looks like XML
+    if (!xmlString.includes('<')) {
+      console.warn("Input doesn't appear to be XML");
     }
 
     console.log("XML validation passed, parsing test results...");
@@ -48,7 +49,7 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
     const parsedResults = parseTestXML(xmlString);
     
     if (parsedResults.length === 0) {
-      throw new Error("No test cases found in the report. Please ensure the XML contains valid test results.");
+      throw new Error("No test cases found in the report. Please check your XML format.");
     }
     
     console.log(`Successfully parsed ${parsedResults.length} test results`);

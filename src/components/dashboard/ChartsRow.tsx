@@ -10,8 +10,7 @@ import {
   Tooltip, 
   Legend, 
   ResponsiveContainer, 
-  CartesianGrid,
-  Cell
+  CartesianGrid
 } from "recharts";
 import { getTestResultsStatsByDate } from "@/services/testReportService";
 
@@ -58,35 +57,35 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
       
       {/* Daily Upload Stats */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle>Daily Test Results</CardTitle>
         </CardHeader>
-        <CardContent className="h-[300px]">
+        <CardContent className="h-[300px] pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={dailyStats.map(item => ({
                 ...item,
                 formattedDate: formatDate(item.date)
               }))}
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              margin={{ top: 10, right: 20, left: 5, bottom: 35 }}
               barGap={2}
-              barSize={20}
+              barSize={16}
             >
               <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
               <XAxis 
                 dataKey="formattedDate" 
                 angle={0} 
-                interval={0}
-                tick={{ fontSize: 12 }}
-                height={50}
+                tick={{ fontSize: 11 }}
+                height={40}
+                tickMargin={5}
               />
               <YAxis 
                 tickFormatter={(value) => value === 0 ? '0' : value}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 11 }}
+                width={25}
               />
               <Tooltip 
                 formatter={(value, name) => {
-                  // Convert name to string before using string methods
                   const nameStr = String(name);
                   return [
                     `${value} tests`, 
@@ -96,34 +95,35 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
                 labelFormatter={(label) => `Date: ${label}`}
                 contentStyle={{ 
                   borderRadius: '6px',
-                  padding: '8px 12px',
+                  padding: '8px 10px',
+                  fontSize: '12px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                 }}
               />
               <Legend 
                 formatter={(value) => {
-                  // Convert value to string before using string methods
                   const valueStr = String(value);
                   return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
                 }}
+                wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }}
               />
               <Bar 
                 dataKey="passed" 
                 name="Passed" 
                 fill={colors.passed}
-                radius={[4, 4, 0, 0]}
+                radius={[3, 3, 0, 0]}
               />
               <Bar 
                 dataKey="failed" 
                 name="Failed" 
                 fill={colors.failed}
-                radius={[4, 4, 0, 0]} 
+                radius={[3, 3, 0, 0]} 
               />
               <Bar 
                 dataKey="flaky" 
                 name="Flaky" 
                 fill={colors.flaky}
-                radius={[4, 4, 0, 0]} 
+                radius={[3, 3, 0, 0]} 
               />
             </BarChart>
           </ResponsiveContainer>

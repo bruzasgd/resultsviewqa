@@ -11,7 +11,7 @@ export const ChartsSecondRow = ({ testResults }: ChartsSecondRowProps) => {
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
       {/* Execution Time Chart */}
-      <ExecutionTimeChart testResults={testResults} />
+      <ExecutionTimeChart testResults={testResults} className="lg:col-span-2" />
 
       {/* Test Type Distribution */}
       <TestTypeDistribution testResults={testResults} />

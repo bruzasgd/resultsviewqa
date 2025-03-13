@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Clock } from "lucide-react";
@@ -26,33 +27,39 @@ export const UploadHistory = ({ uploads }: UploadHistoryProps) => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="pb-2">
         <CardTitle>Upload History</CardTitle>
         <CardDescription>Recent test report uploads</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
-            {uploads.map((upload) => (
-              <div
-                key={upload.id}
-                className="flex items-start space-x-4 border-b border-gray-200 pb-4 last:border-0"
-              >
-                <div className="rounded-full p-2 bg-blue-50">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">{upload.filename}</p>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-3 w-3 text-gray-400" />
-                    <p className="text-xs text-gray-500">
-                      {formatDate(upload.timestamp)}
-                    </p>
-                    <span className="text-xs text-gray-400">{upload.fileSize}</span>
+      <CardContent className="pt-2">
+        <ScrollArea className="h-[250px] pr-4">
+          <div className="space-y-3">
+            {uploads.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">
+                No upload history available
+              </div>
+            ) : (
+              uploads.map((upload) => (
+                <div
+                  key={upload.id}
+                  className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0"
+                >
+                  <div className="rounded-full p-1.5 bg-blue-50">
+                    <FileText className="h-3.5 w-3.5 text-blue-500" />
+                  </div>
+                  <div className="flex-1 space-y-0.5">
+                    <p className="text-sm font-medium">{upload.filename}</p>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-3 w-3 text-gray-400" />
+                      <p className="text-xs text-gray-500">
+                        {formatDate(upload.timestamp)}
+                      </p>
+                      <span className="text-xs text-gray-400">{upload.fileSize}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </ScrollArea>
       </CardContent>

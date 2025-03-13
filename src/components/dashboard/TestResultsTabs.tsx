@@ -24,18 +24,18 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
   const { uploads } = useUploadHistory();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Tabs defaultValue="recent" className="w-full">
-        <TabsList>
+        <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex">
           <TabsTrigger value="recent">Recent Tests</TabsTrigger>
           <TabsTrigger value="failed">Failed Tests</TabsTrigger>
           <TabsTrigger value="flaky">Flaky Tests</TabsTrigger>
         </TabsList>
 
         {/* Recent Tests Tab */}
-        <TabsContent value="recent" className="mt-4">
+        <TabsContent value="recent" className="mt-3">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-0">
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Recent Test Results</CardTitle>
@@ -45,15 +45,15 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setVisibleTables(prev => ({ ...prev, recent: !prev.recent }))}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 h-8"
                 >
                   {visibleTables.recent ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
               </div>
             </CardHeader>
             <CardContent className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              visibleTables.recent ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+              "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2",
+              visibleTables.recent ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
             )}>
               <TestResultsList tests={testResults.slice(-5).reverse()} />
             </CardContent>
@@ -61,9 +61,9 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
         </TabsContent>
 
         {/* Failed Tests Tab */}
-        <TabsContent value="failed" className="mt-4">
+        <TabsContent value="failed" className="mt-3">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-0">
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Failed Tests</CardTitle>
@@ -73,15 +73,15 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setVisibleTables(prev => ({ ...prev, failed: !prev.failed }))}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 h-8"
                 >
                   {visibleTables.failed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
               </div>
             </CardHeader>
             <CardContent className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              visibleTables.failed ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+              "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2",
+              visibleTables.failed ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
             )}>
               <TestResultsList tests={testResults.filter(test => test.status === 'failed').slice(0, 5)} />
             </CardContent>
@@ -89,9 +89,9 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
         </TabsContent>
 
         {/* Flaky Tests Tab */}
-        <TabsContent value="flaky" className="mt-4">
+        <TabsContent value="flaky" className="mt-3">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-0">
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Flaky Tests</CardTitle>
@@ -101,15 +101,15 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setVisibleTables(prev => ({ ...prev, flaky: !prev.flaky }))}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 h-8"
                 >
                   {visibleTables.flaky ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
               </div>
             </CardHeader>
             <CardContent className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              visibleTables.flaky ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+              "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2",
+              visibleTables.flaky ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
             )}>
               <TestResultsList tests={testResults.filter(test => test.status === 'flaky').slice(0, 5)} />
             </CardContent>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
@@ -118,7 +117,7 @@ const Dashboard = () => {
   const metrics = calculateMetrics();
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-8">
+    <div className="flex flex-col gap-4 p-3 md:p-6">
       <DashboardHeader 
         title="Test Automation Dashboard" 
         description="Monitor your automated test executions and quality metrics" 

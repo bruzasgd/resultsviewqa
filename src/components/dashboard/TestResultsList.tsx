@@ -55,22 +55,22 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
   };
 
   return (
-    <ScrollArea className="h-[450px] rounded-md">
+    <ScrollArea className="h-[400px] rounded-md">
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 bg-background z-10">
           <TableRow>
-            <TableHead className="w-[50px]">Status</TableHead>
+            <TableHead className="w-[40px]">Status</TableHead>
             <TableHead>Test Name</TableHead>
-            <TableHead>Browser</TableHead>
-            <TableHead className="w-[100px]">Duration</TableHead>
-            <TableHead className="w-[180px]">Timestamp</TableHead>
-            <TableHead className="text-right">Details</TableHead>
+            <TableHead className="w-[100px]">Browser</TableHead>
+            <TableHead className="w-[80px]">Duration</TableHead>
+            <TableHead className="w-[160px]">Timestamp</TableHead>
+            <TableHead className="text-right w-[80px]">Details</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tests.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
                 No test results available
               </TableCell>
             </TableRow>
@@ -83,7 +83,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 className="w-full"
               >
                 <TableRow className="border-b">
-                  <TableCell>
+                  <TableCell className="py-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -97,35 +97,35 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium py-2">
                     <div className="flex flex-col">
-                      <span className="truncate max-w-[300px]">{test.name}</span>
+                      <span className="truncate max-w-[280px]">{test.name}</span>
                       {test.suite && (
-                        <span className="text-xs text-muted-foreground truncate max-w-[300px]">
+                        <span className="text-xs text-muted-foreground truncate max-w-[280px]">
                           {test.suite}
                         </span>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
+                  <TableCell className="py-2">
+                    <div className="flex items-center gap-1">
                       <Monitor className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span>{test.browser}</span>
+                      <span className="text-sm">{test.browser}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
+                  <TableCell className="py-2">
+                    <div className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span>{test.duration}</span>
+                      <span className="text-sm">{test.duration}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-2 text-sm">
                     {formatTime(test.timestamp)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-2">
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4 mr-1" />
+                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                        <ExternalLink className="h-3.5 w-3.5 mr-1" />
                         {openItems[test.id] ? 'Hide' : 'View'}
                       </Button>
                     </CollapsibleTrigger>
@@ -133,27 +133,27 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 </TableRow>
                 <CollapsibleContent>
                   <TableRow>
-                    <TableCell colSpan={6} className="bg-muted/50">
-                      <div className="p-4 space-y-3">
-                        <div className="grid grid-cols-2 gap-4">
+                    <TableCell colSpan={6} className="bg-muted/50 p-0">
+                      <div className="p-3 space-y-2">
+                        <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <h4 className="text-sm font-semibold mb-1">Framework</h4>
-                            <Badge variant="outline" className="font-mono">
+                            <h4 className="text-xs font-semibold mb-1">Framework</h4>
+                            <Badge variant="outline" className="font-mono text-xs">
                               {test.framework}
                             </Badge>
                           </div>
                           
                           <div>
-                            <h4 className="text-sm font-semibold mb-1">Uploaded</h4>
-                            <p className="text-sm text-muted-foreground">
+                            <h4 className="text-xs font-semibold mb-1">Uploaded</h4>
+                            <p className="text-xs text-muted-foreground">
                               {test.uploadDate ? new Date(test.uploadDate).toLocaleString() : 'Unknown'}
                             </p>
                           </div>
                           
                           {test.filename && (
                             <div>
-                              <h4 className="text-sm font-semibold mb-1">File</h4>
-                              <p className="text-sm text-muted-foreground truncate max-w-[300px]">
+                              <h4 className="text-xs font-semibold mb-1">File</h4>
+                              <p className="text-xs text-muted-foreground truncate max-w-[300px]">
                                 {test.filename}
                               </p>
                             </div>
@@ -161,8 +161,8 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                           
                           {test.errorMessage && (
                             <div className="col-span-2">
-                              <h4 className="text-sm font-semibold text-red-500 mb-1">Error</h4>
-                              <div className="bg-red-50 border border-red-200 rounded p-2 overflow-auto max-h-[100px]">
+                              <h4 className="text-xs font-semibold text-red-500 mb-1">Error</h4>
+                              <div className="bg-red-50 border border-red-200 rounded p-2 overflow-auto max-h-[80px]">
                                 <pre className="text-xs text-red-700 whitespace-pre-wrap">{test.errorMessage}</pre>
                               </div>
                             </div>

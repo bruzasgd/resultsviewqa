@@ -3,13 +3,14 @@
  * XML Parser for test reports
  * Handles parsing of XML test reports from different testing frameworks
  */
-import { ParsedTestResult, parseXMLString } from './parsers/baseParser';
+import { parseXMLString, ParsedTestResult } from './parsers/baseParser';
 import { parsePlaywrightXML } from './parsers/playwrightParser';
 import { parseCypressXML } from './parsers/cypressParser';
 import { parseGenericXML } from './parsers/genericParser';
 
 // Re-export the ParsedTestResult type
-export { ParsedTestResult };
+// Using 'export type' for TypeScript modules with isolatedModules enabled
+export type { ParsedTestResult };
 
 // Generic XML parser that identifies the framework and calls the appropriate parser
 export const parseTestXML = (xmlString: string): ParsedTestResult[] => {

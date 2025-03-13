@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
 import { ChartsRow } from "@/components/dashboard/ChartsRow";
@@ -9,12 +9,30 @@ import { ApiDocumentation } from "@/components/dashboard/ApiDocumentation";
 import { mockTestData } from "@/data/mockTestData";
 import { getAllTestResults, initializeWithMockData, subscribeToTestResults, getResultsForLastNDays } from "@/services/testReportService";
 import { ParsedTestResult } from "@/lib/xmlParser";
+import { toast } from "@/components/ui/use-toast";
 
 const Dashboard = () => {
   const [testResults, setTestResults] = useState<ParsedTestResult[]>([]);
   const [filteredResults, setFilteredResults] = useState<ParsedTestResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState("7days");
+
+  const refreshTestResults = useCallback(async () => {
+    setLoading(true);
+    try {
+      const results = await getAllTestResults();
+      setTestResults(results);
+    } catch (error) {
+      console.error("Error fetching test results:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch test results. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize with mock data
@@ -23,30 +41,19 @@ const Dashboard = () => {
 
     // Subscribe to test result changes
     const unsubscribe = subscribeToTestResults(() => {
+      console.log("Test results updated, refreshing...");
       refreshTestResults();
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [refreshTestResults]);
 
   useEffect(() => {
     // Apply time period filter
     filterResultsByTimePeriod(timePeriod);
   }, [testResults, timePeriod]);
-
-  const refreshTestResults = async () => {
-    setLoading(true);
-    try {
-      const results = await getAllTestResults();
-      setTestResults(results);
-    } catch (error) {
-      console.error("Error fetching test results:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterResultsByTimePeriod = (period: string) => {
     let days = 7; // default

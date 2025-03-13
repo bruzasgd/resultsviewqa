@@ -24,6 +24,7 @@ export const subscribeToTestResults = (listener: TestResultsListener) => {
 
 // Notify listeners of changes
 const notifyListeners = () => {
+  console.log("Notifying listeners of test result changes");
   listeners.forEach(listener => listener());
 };
 
@@ -32,21 +33,26 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
   try {
     console.log("Starting to process XML file upload", { filenameProvided: !!filename });
     
-    // Very basic format validation - more lenient for Playwright
+    // Basic format validation - more lenient especially for Playwright
     if (!xmlString || !xmlString.trim()) {
       throw new Error("Empty test report provided");
     }
 
-    // Relax validation to support more formats
-    // Just a basic check to ensure it at least looks like XML
+    // Very basic XML check - extremely lenient for Playwright reports
     if (!xmlString.includes('<')) {
-      console.warn("Input doesn't appear to be XML");
+      console.warn("Input doesn't appear to be XML, but will try to parse anyway");
     }
 
     console.log("XML validation passed, parsing test results...");
     
-    // Parse the XML and validate test results
-    const parsedResults = parseTestXML(xmlString);
+    // Parse the XML and validate test results - use try/catch to make this more robust
+    let parsedResults: ParsedTestResult[] = [];
+    try {
+      parsedResults = parseTestXML(xmlString);
+    } catch (error) {
+      console.error("Error parsing XML:", error);
+      throw new Error(`Failed to parse test results: ${error instanceof Error ? error.message : 'Unknown format'}`);
+    }
     
     if (parsedResults.length === 0) {
       throw new Error("No test cases found in the report. Please check your XML format.");
@@ -86,6 +92,7 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
 // Get all test results
 export const getAllTestResults = async (): Promise<ParsedTestResult[]> => {
   try {
+    console.log("📥 Fetching test results...");
     // Simulate API call to get test results
     const response = await getTestResultsAPI();
     

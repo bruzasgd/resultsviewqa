@@ -42,7 +42,10 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
               <YAxis />
               <Tooltip 
                 formatter={(value, name) => {
-                  return [`${value} tests`, name.charAt(0).toUpperCase() + name.slice(1)];
+                  // Convert name to string to ensure we can use string methods
+                  const nameStr = String(name);
+                  // Now safely use string methods
+                  return [`${value} tests`, nameStr.charAt(0).toUpperCase() + nameStr.slice(1)];
                 }}
                 labelFormatter={(label) => `Date: ${label}`}
               />

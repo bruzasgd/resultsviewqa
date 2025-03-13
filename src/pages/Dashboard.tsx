@@ -7,12 +7,14 @@ import { ChartsSecondRow } from "@/components/dashboard/ChartsSecondRow";
 import { TestResultsTabs } from "@/components/dashboard/TestResultsTabs";
 import { ApiDocumentation } from "@/components/dashboard/ApiDocumentation";
 import { mockTestData } from "@/data/mockTestData";
-import { getAllTestResults, initializeWithMockData, subscribeToTestResults } from "@/services/testReportService";
+import { getAllTestResults, initializeWithMockData, subscribeToTestResults, getResultsForLastNDays } from "@/services/testReportService";
 import { ParsedTestResult } from "@/lib/xmlParser";
 
 const Dashboard = () => {
   const [testResults, setTestResults] = useState<ParsedTestResult[]>([]);
+  const [filteredResults, setFilteredResults] = useState<ParsedTestResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timePeriod, setTimePeriod] = useState("7days");
 
   useEffect(() => {
     // Initialize with mock data
@@ -29,6 +31,11 @@ const Dashboard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Apply time period filter
+    filterResultsByTimePeriod(timePeriod);
+  }, [testResults, timePeriod]);
+
   const refreshTestResults = async () => {
     setLoading(true);
     try {
@@ -41,23 +48,54 @@ const Dashboard = () => {
     }
   };
 
-  // Calculate metrics and trends
+  const filterResultsByTimePeriod = (period: string) => {
+    let days = 7; // default
+    
+    switch (period) {
+      case "today":
+        days = 1;
+        break;
+      case "yesterday":
+        days = 2;
+        break;
+      case "7days":
+        days = 7;
+        break;
+      case "30days":
+        days = 30;
+        break;
+      case "90days":
+        days = 90;
+        break;
+      default:
+        days = 7;
+    }
+    
+    const filtered = getResultsForLastNDays(days);
+    setFilteredResults(filtered);
+  };
+
+  const handleTimePeriodChange = (value: string) => {
+    setTimePeriod(value);
+  };
+
+  // Calculate metrics and trends based on filtered results
   const calculateMetrics = () => {
-    const currentPassRate = testResults.length > 0
-      ? Math.round((testResults.filter(test => test.status === 'passed').length / testResults.length) * 100)
+    const currentPassRate = filteredResults.length > 0
+      ? Math.round((filteredResults.filter(test => test.status === 'passed').length / filteredResults.length) * 100)
       : 0;
 
-    const failedTests = testResults.filter(test => test.status === 'failed').length;
-    const previousFailedTests = testResults.slice(0, -5).filter(test => test.status === 'failed').length;
+    const failedTests = filteredResults.filter(test => test.status === 'failed').length;
+    const previousFailedTests = filteredResults.slice(0, -5).filter(test => test.status === 'failed').length;
     const failedTrend = failedTests > previousFailedTests ? 'up' : 'down';
     
-    const totalDuration = testResults.reduce((total, test) => {
+    const totalDuration = filteredResults.reduce((total, test) => {
       const duration = parseFloat(test.duration.replace('s', ''));
       return total + (isNaN(duration) ? 0 : duration);
     }, 0);
     
-    const flakyTests = testResults.filter(test => test.status === 'flaky').length;
-    const previousFlakyTests = testResults.slice(0, -5).filter(test => test.status === 'flaky').length;
+    const flakyTests = filteredResults.filter(test => test.status === 'flaky').length;
+    const previousFlakyTests = filteredResults.slice(0, -5).filter(test => test.status === 'flaky').length;
     const flakyTrend = flakyTests > previousFlakyTests ? 'up' : 'down';
 
     return {
@@ -79,15 +117,17 @@ const Dashboard = () => {
         description="Monitor your automated test executions and quality metrics" 
         onRefresh={refreshTestResults}
         onReportUploaded={refreshTestResults}
+        timePeriod={timePeriod}
+        onTimePeriodChange={handleTimePeriodChange}
       />
       
       <MetricsRow {...metrics} />
       
-      <ChartsRow testResults={testResults} />
+      <ChartsRow testResults={filteredResults} />
       
-      <ChartsSecondRow testResults={testResults} />
+      <ChartsSecondRow testResults={filteredResults} />
 
-      <TestResultsTabs testResults={testResults} />
+      <TestResultsTabs testResults={filteredResults} />
 
       <ApiDocumentation />
     </div>

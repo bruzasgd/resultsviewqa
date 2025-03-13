@@ -28,26 +28,36 @@ const notifyListeners = () => {
 };
 
 // Upload a test report as XML
-export const uploadTestReport = async (xmlString: string): Promise<ParsedTestResult[]> => {
+export const uploadTestReport = async (xmlString: string, filename?: string): Promise<ParsedTestResult[]> => {
   try {
+    console.log("Starting to process XML file upload", { filenameProvided: !!filename });
+    
     // Basic format validation
     if (!xmlString || !xmlString.trim()) {
       throw new Error("Empty test report provided");
     }
 
-    if (!xmlString.includes('<?xml')) {
-      throw new Error("Invalid file format: Not a valid XML file");
+    // More lenient validation
+    if (!xmlString.includes('<test')) {
+      console.warn("XML may not be in expected format - doesn't contain test elements");
     }
 
-    if (!xmlString.includes('<testsuites') && !xmlString.includes('<testsuite')) {
-      throw new Error("Invalid test report format: Missing required test suite elements");
-    }
-
+    console.log("XML validation passed, parsing test results...");
+    
     // Parse the XML and validate test results
     const parsedResults = parseTestXML(xmlString);
     
     if (parsedResults.length === 0) {
       throw new Error("No test cases found in the report. Please ensure the XML contains valid test results.");
+    }
+    
+    console.log(`Successfully parsed ${parsedResults.length} test results`);
+    
+    // Add filename if provided
+    if (filename) {
+      parsedResults.forEach(result => {
+        result.filename = filename;
+      });
     }
     
     // Simulate API call to upload the test report
@@ -57,8 +67,9 @@ export const uploadTestReport = async (xmlString: string): Promise<ParsedTestRes
       throw new Error(response.error || "Failed to upload test report");
     }
     
-    // Update the test results with new data
-    testResults = [...parsedResults];
+    // Update the test results with new data - prepend new results
+    testResults = [...parsedResults, ...testResults];
+    
     // Notify all subscribers about the state change
     notifyListeners();
     
@@ -90,12 +101,75 @@ export const getAllTestResults = async (): Promise<ParsedTestResult[]> => {
   }
 };
 
+// Get results grouped by date
+export const getResultsByDate = (): Record<string, ParsedTestResult[]> => {
+  const resultsByDate: Record<string, ParsedTestResult[]> = {};
+  
+  testResults.forEach(result => {
+    const date = result.uploadDate 
+      ? result.uploadDate.toISOString().split('T')[0] 
+      : new Date().toISOString().split('T')[0];
+    
+    if (!resultsByDate[date]) {
+      resultsByDate[date] = [];
+    }
+    
+    resultsByDate[date].push(result);
+  });
+  
+  return resultsByDate;
+};
+
+// Get results for the last N days
+export const getResultsForLastNDays = (days: number): ParsedTestResult[] => {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+  
+  return testResults.filter(result => {
+    const resultDate = result.uploadDate || new Date();
+    return resultDate >= cutoffDate;
+  });
+};
+
 // Clear all test results
 export const clearTestResults = (): void => {
   testResults = [];
+  notifyListeners();
+};
+
+// Get test results stats by date
+export const getTestResultsStatsByDate = (): {
+  date: string;
+  passed: number;
+  failed: number;
+  flaky: number;
+  total: number;
+}[] => {
+  const resultsByDate = getResultsByDate();
+  
+  return Object.entries(resultsByDate).map(([date, results]) => {
+    const passed = results.filter(r => r.status === 'passed').length;
+    const failed = results.filter(r => r.status === 'failed').length;
+    const flaky = results.filter(r => r.status === 'flaky').length;
+    
+    return {
+      date,
+      passed,
+      failed,
+      flaky,
+      total: results.length
+    };
+  }).sort((a, b) => a.date.localeCompare(b.date));
 };
 
 // Initialize with some data (for demo purposes)
 export const initializeWithMockData = (mockData: ParsedTestResult[]): void => {
-  testResults = [...mockData];
+  // Add upload date if not present
+  const dataWithDates = mockData.map(item => ({
+    ...item,
+    uploadDate: item.uploadDate || new Date()
+  }));
+  
+  testResults = [...dataWithDates];
+  notifyListeners();
 };

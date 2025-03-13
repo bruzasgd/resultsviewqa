@@ -9,13 +9,15 @@ const parseXMLString = (xmlString: string): Document => {
   if (!xmlString || !xmlString.trim()) {
     throw new Error('Empty XML string provided');
   }
-  if (!xmlString.includes('<?xml')) {
-    throw new Error('Invalid XML: Missing XML declaration');
-  }
+  
+  // Remove BOM if present and clean whitespace
+  const cleanXml = xmlString.trim().replace(/^\ufeff/g, '');
+  
   const parser = new DOMParser();
-  const doc = parser.parseFromString(xmlString, "application/xml");
+  const doc = parser.parseFromString(cleanXml, "application/xml");
   const parseError = doc.querySelector('parsererror');
   if (parseError) {
+    console.error("XML parsing error details:", parseError.textContent);
     throw new Error(`XML parsing error: ${parseError.textContent}`);
   }
   return doc;
@@ -31,99 +33,135 @@ export interface ParsedTestResult {
   framework: string;
   browser: string;
   errorMessage?: string;
+  suite?: string;
+  filename?: string;
+  uploadDate?: Date;
 }
 
 // Parse Playwright XML report
 export const parsePlaywrightXML = (xmlString: string): ParsedTestResult[] => {
-  const doc = parseXMLString(xmlString);
-  
-  // Validate XML structure for Playwright
-  if (doc.getElementsByTagName('parsererror').length > 0) {
-    throw new Error('Invalid XML format in Playwright report');
-  }
-  
-  // Check for required Playwright structure
-  if (!doc.querySelector('testsuites') && !doc.querySelector('testsuite')) {
-    throw new Error('Invalid Playwright report format: Missing testsuites/testsuite element');
-  }
-  
-  const testcases = doc.querySelectorAll('testcase');
-  
-  if (testcases.length === 0) {
-    throw new Error('No test cases found in Playwright report');
-  }
-  const results: ParsedTestResult[] = [];
-
-  testcases.forEach((testcase, index) => {
-    const failures = testcase.querySelectorAll('failure');
-    const flaky = testcase.getAttribute('flaky') === 'true';
+  try {
+    const doc = parseXMLString(xmlString);
     
-    // Determine status
-    let status: 'passed' | 'failed' | 'flaky' = 'passed';
-    let errorMessage: string | undefined;
-    
-    if (failures.length > 0) {
-      status = 'failed';
-      errorMessage = failures[0].textContent || 'Unknown error';
-    } else if (flaky) {
-      status = 'flaky';
+    // Check for required Playwright structure
+    if (!doc.querySelector('testsuites') && !doc.querySelector('testsuite')) {
+      throw new Error('Invalid Playwright report format: Missing testsuites/testsuite element');
     }
+    
+    const testcases = doc.querySelectorAll('testcase');
+    
+    if (testcases.length === 0) {
+      throw new Error('No test cases found in Playwright report');
+    }
+    const results: ParsedTestResult[] = [];
+    const uploadDate = new Date();
 
-    results.push({
-      id: `pw-${index + 1}`,
-      name: testcase.getAttribute('name') || `Test ${index + 1}`,
-      status,
-      duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
-      timestamp: testcase.getAttribute('timestamp') || new Date().toISOString(),
-      framework: 'Playwright',
-      browser: testcase.getAttribute('browser') || 'Unknown',
-      ...(errorMessage && { errorMessage })
+    testcases.forEach((testcase, index) => {
+      const failures = testcase.querySelectorAll('failure');
+      const flaky = testcase.getAttribute('flaky') === 'true';
+      
+      // Determine status
+      let status: 'passed' | 'failed' | 'flaky' = 'passed';
+      let errorMessage: string | undefined;
+      
+      if (failures.length > 0) {
+        status = 'failed';
+        errorMessage = failures[0].textContent || 'Unknown error';
+      } else if (flaky) {
+        status = 'flaky';
+      }
+
+      // Get parent testsuite for additional metadata
+      const testsuite = testcase.closest('testsuite');
+      const browser = testsuite?.getAttribute('hostname') || 'Unknown';
+      const timestamp = testsuite?.getAttribute('timestamp') || new Date().toISOString();
+      const suite = testsuite?.getAttribute('name') || '';
+
+      results.push({
+        id: `pw-${index + 1}-${Date.now()}`,
+        name: testcase.getAttribute('name') || `Test ${index + 1}`,
+        status,
+        duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
+        timestamp,
+        framework: 'Playwright',
+        browser,
+        suite,
+        uploadDate,
+        ...(errorMessage && { errorMessage })
+      });
     });
-  });
 
-  return results;
+    return results;
+  } catch (error) {
+    console.error("Playwright XML parsing error:", error);
+    throw error;
+  }
 };
 
 // Parse Cypress XML report
 export const parseCypressXML = (xmlString: string): ParsedTestResult[] => {
-  const doc = parseXMLString(xmlString);
-  const testcases = doc.querySelectorAll('testcase');
-  const results: ParsedTestResult[] = [];
+  try {
+    const doc = parseXMLString(xmlString);
+    const testcases = doc.querySelectorAll('testcase');
+    const results: ParsedTestResult[] = [];
+    const uploadDate = new Date();
 
-  testcases.forEach((testcase, index) => {
-    const failures = testcase.querySelectorAll('failure');
-    const skipped = testcase.querySelectorAll('skipped');
-    
-    // Determine status
-    let status: 'passed' | 'failed' | 'flaky' = 'passed';
-    let errorMessage: string | undefined;
-    
-    if (failures.length > 0) {
-      status = 'failed';
-      errorMessage = failures[0].textContent || 'Unknown error';
-    } else if (skipped.length > 0) {
-      status = 'flaky'; // Treating skipped as flaky for now
-    }
+    testcases.forEach((testcase, index) => {
+      const failures = testcase.querySelectorAll('failure');
+      const skipped = testcase.querySelectorAll('skipped');
+      
+      // Determine status
+      let status: 'passed' | 'failed' | 'flaky' = 'passed';
+      let errorMessage: string | undefined;
+      
+      if (failures.length > 0) {
+        status = 'failed';
+        errorMessage = failures[0].textContent || 'Unknown error';
+      } else if (skipped.length > 0) {
+        status = 'flaky'; // Treating skipped as flaky for now
+      }
 
-    results.push({
-      id: `cy-${index + 1}`,
-      name: testcase.getAttribute('name') || `Test ${index + 1}`,
-      status,
-      duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
-      timestamp: testcase.getAttribute('timestamp') || new Date().toISOString(),
-      framework: 'Cypress',
-      browser: testcase.getAttribute('browser') || 'Chrome', // Cypress default
-      ...(errorMessage && { errorMessage })
+      // Get parent testsuite for additional metadata
+      const testsuite = testcase.closest('testsuite');
+      const browser = testsuite?.getAttribute('hostname') || 'Chrome';
+      const timestamp = testsuite?.getAttribute('timestamp') || new Date().toISOString();
+      const suite = testsuite?.getAttribute('name') || '';
+      
+      results.push({
+        id: `cy-${index + 1}-${Date.now()}`,
+        name: testcase.getAttribute('name') || `Test ${index + 1}`,
+        status,
+        duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
+        timestamp,
+        framework: 'Cypress',
+        browser,
+        suite,
+        uploadDate,
+        ...(errorMessage && { errorMessage })
+      });
     });
-  });
 
-  return results;
+    return results;
+  } catch (error) {
+    console.error("Cypress XML parsing error:", error);
+    throw error;
+  }
 };
 
 // Generic XML parser that identifies the framework and calls the appropriate parser
 export const parseTestXML = (xmlString: string): ParsedTestResult[] => {
   try {
+    console.log("Parsing XML, length:", xmlString.length);
+    console.log("First 100 chars:", xmlString.substring(0, 100));
+    
     const doc = parseXMLString(xmlString);
+    
+    // Log the structure for debugging
+    console.log("XML structure:", {
+      hasTestSuites: !!doc.querySelector('testsuites'),
+      hasTestSuite: !!doc.querySelector('testsuite'),
+      testcaseCount: doc.querySelectorAll('testcase').length
+    });
     
     // Enhanced framework detection
     const isPlaywright = doc.querySelector('playwright') ||
@@ -155,40 +193,72 @@ export const parseTestXML = (xmlString: string): ParsedTestResult[] => {
       
       const results: ParsedTestResult[] = [];
       let testIndex = 0;
+      const uploadDate = new Date();
       
       const testsuites = doc.querySelectorAll('testsuite');
-      testsuites.forEach(testsuite => {
-        const browser = testsuite.getAttribute('hostname') || 'Unknown';
-        const timestamp = testsuite.getAttribute('timestamp') || new Date().toISOString();
-        
-        const testcases = testsuite.querySelectorAll('testcase');
-        testcases.forEach(testcase => {
+      
+      if (testsuites.length === 0) {
+        // Handle flat structure with no test suites
+        testcases.forEach((testcase, index) => {
           const failures = testcase.querySelectorAll('failure');
-          const skipped = testcase.querySelectorAll('skipped');
-          const error = testcase.querySelectorAll('error');
           
           let status: 'passed' | 'failed' | 'flaky' = 'passed';
           let errorMessage: string | undefined;
           
-          if (failures.length > 0 || error.length > 0) {
+          if (failures.length > 0) {
             status = 'failed';
-            errorMessage = (failures[0] || error[0]).textContent || 'Unknown error';
-          } else if (skipped.length > 0) {
-            status = 'flaky';
+            errorMessage = failures[0].textContent || 'Unknown error';
           }
           
           results.push({
-            id: `test-${++testIndex}`,
+            id: `test-${++testIndex}-${Date.now()}`,
             name: testcase.getAttribute('name') || testcase.getAttribute('classname') || `Test ${testIndex}`,
             status,
             duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
-            timestamp,
-            framework: testsuite.getAttribute('name')?.split('.')[0] || 'Unknown',
-            browser,
+            timestamp: new Date().toISOString(),
+            framework: 'Unknown',
+            browser: 'Unknown',
+            uploadDate,
             ...(errorMessage && { errorMessage })
           });
         });
-      });
+      } else {
+        testsuites.forEach(testsuite => {
+          const browser = testsuite.getAttribute('hostname') || 'Unknown';
+          const timestamp = testsuite.getAttribute('timestamp') || new Date().toISOString();
+          const suite = testsuite.getAttribute('name') || '';
+          
+          const testcases = testsuite.querySelectorAll('testcase');
+          testcases.forEach(testcase => {
+            const failures = testcase.querySelectorAll('failure');
+            const skipped = testcase.querySelectorAll('skipped');
+            const error = testcase.querySelectorAll('error');
+            
+            let status: 'passed' | 'failed' | 'flaky' = 'passed';
+            let errorMessage: string | undefined;
+            
+            if (failures.length > 0 || error.length > 0) {
+              status = 'failed';
+              errorMessage = (failures[0] || error[0]).textContent || 'Unknown error';
+            } else if (skipped.length > 0) {
+              status = 'flaky';
+            }
+            
+            results.push({
+              id: `test-${++testIndex}-${Date.now()}`,
+              name: testcase.getAttribute('name') || testcase.getAttribute('classname') || `Test ${testIndex}`,
+              status,
+              duration: `${parseFloat(testcase.getAttribute('time') || '0').toFixed(2)}s`,
+              timestamp,
+              framework: testsuite.getAttribute('name')?.split('.')[0] || 'Unknown',
+              browser,
+              suite,
+              uploadDate,
+              ...(errorMessage && { errorMessage })
+            });
+          });
+        });
+      }
       
       return results;
     }

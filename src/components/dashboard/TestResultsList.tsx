@@ -54,6 +54,28 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
     }
   };
 
+  // Helper function to safely format upload date
+  const formatUploadDate = (date: Date | undefined) => {
+    if (!date) return 'Unknown';
+    
+    try {
+      // Check if date is already a Date object
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        return date.toLocaleString();
+      }
+      
+      // If it's a string representation, convert it
+      if (typeof date === 'string') {
+        return new Date(date).toLocaleString();
+      }
+      
+      return 'Unknown';
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return 'Unknown';
+    }
+  };
+
   return (
     <ScrollArea className="h-[400px] rounded-md border border-amber-100/50">
       <Table>
@@ -146,7 +168,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                           <div>
                             <h4 className="text-xs font-semibold mb-1">Uploaded</h4>
                             <p className="text-xs text-muted-foreground">
-                              {test.uploadDate ? new Date(test.uploadDate).toLocaleString() : 'Unknown'}
+                              {formatUploadDate(test.uploadDate)}
                             </p>
                           </div>
                           

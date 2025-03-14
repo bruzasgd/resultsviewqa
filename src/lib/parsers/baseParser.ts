@@ -34,6 +34,6 @@ export interface ParsedTestResult {
   errorMessage?: string;
   suite?: string;
   filename?: string;
-  uploadDate?: Date;
+  uploadDate?: Date | string; // Updated to accept both Date object or string
   uploadId?: string; // Added the uploadId property
 }

@@ -35,4 +35,5 @@ export interface ParsedTestResult {
   suite?: string;
   filename?: string;
   uploadDate?: Date;
+  uploadId?: string; // Added the uploadId property
 }

@@ -58,7 +58,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
     <ScrollArea className="h-[400px] rounded-md">
       <Table>
         <TableHeader className="sticky top-0 bg-background z-10">
-          <TableRow>
+          <TableRow className="bg-amber-50/80">
             <TableHead className="w-[40px]">Status</TableHead>
             <TableHead>Test Name</TableHead>
             <TableHead className="w-[100px]">Browser</TableHead>
@@ -82,7 +82,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 onOpenChange={() => toggleItem(test.id)}
                 className="w-full"
               >
-                <TableRow className="border-b">
+                <TableRow className="border-b hover:bg-amber-50/40 transition-colors">
                   <TableCell className="py-2">
                     <TooltipProvider>
                       <Tooltip>
@@ -99,7 +99,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                   </TableCell>
                   <TableCell className="font-medium py-2">
                     <div className="flex flex-col">
-                      <span className="truncate max-w-[280px]">{test.name}</span>
+                      <span className="truncate max-w-[280px] text-slate-800">{test.name}</span>
                       {test.suite && (
                         <span className="text-xs text-muted-foreground truncate max-w-[280px]">
                           {test.suite}
@@ -124,7 +124,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                   </TableCell>
                   <TableCell className="text-right py-2">
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Button variant="ghost" size="sm" className="h-7 px-2 hover:bg-amber-100 hover:text-amber-700">
                         <ExternalLink className="h-3.5 w-3.5 mr-1" />
                         {openItems[test.id] ? 'Hide' : 'View'}
                       </Button>
@@ -133,12 +133,12 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 </TableRow>
                 <CollapsibleContent>
                   <TableRow>
-                    <TableCell colSpan={6} className="bg-muted/50 p-0">
+                    <TableCell colSpan={6} className="bg-amber-50/40 p-0">
                       <div className="p-3 space-y-2">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <h4 className="text-xs font-semibold mb-1">Framework</h4>
-                            <Badge variant="outline" className="font-mono text-xs">
+                            <Badge variant="outline" className="font-mono text-xs bg-amber-50 text-amber-700 border-amber-200">
                               {test.framework}
                             </Badge>
                           </div>

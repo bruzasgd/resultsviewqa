@@ -24,9 +24,9 @@ export const ExecutionTimeChart = ({ testResults, className }: ExecutionTimeChar
   ];
 
   return (
-    <Card className={cn(className)}>
-      <CardHeader className="pb-2">
-        <CardTitle>Execution Time</CardTitle>
+    <Card className={cn(className, "border border-amber-100")}>
+      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+        <CardTitle className="text-slate-800">Execution Time</CardTitle>
         <CardDescription>Test execution time trend</CardDescription>
       </CardHeader>
       <CardContent className="h-[300px] pt-2">
@@ -56,7 +56,7 @@ export const ExecutionTimeChart = ({ testResults, className }: ExecutionTimeChar
             legendOffset: -35,
             legendPosition: "middle",
           }}
-          colors={"#3b82f6"}
+          colors={"#f7cc4d"} // Changed to amber/yellow to match theme
           pointSize={8}
           pointColor={{ theme: "background" }}
           pointBorderWidth={2}
@@ -74,17 +74,20 @@ export const ExecutionTimeChart = ({ testResults, className }: ExecutionTimeChar
                 borderRadius: "6px",
                 boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                 padding: "10px 12px",
+                borderColor: "#f7cc4d"
               },
             },
             axis: {
               ticks: {
                 text: {
-                  fontSize: 11
+                  fontSize: 11,
+                  fill: "#1e293b"
                 }
               },
               legend: {
                 text: {
-                  fontSize: 11
+                  fontSize: 11,
+                  fill: "#1e293b"
                 }
               }
             }

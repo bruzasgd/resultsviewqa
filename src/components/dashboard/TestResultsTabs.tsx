@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TestResultsList } from "@/components/dashboard/TestResultsList";
 import { ParsedTestResult } from "@/lib/xmlParser";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,13 +20,20 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
     failed: true,
     flaky: true
   });
-
+  
+  // For real-time updates of test results
+  const [displayedResults, setDisplayedResults] = useState<ParsedTestResult[]>([]);
   const { uploads } = useUploadHistory();
+  
+  // Update displayed results whenever testResults prop changes
+  useEffect(() => {
+    setDisplayedResults(testResults.slice(-5).reverse());
+  }, [testResults]);
 
   return (
     <div className="space-y-4">
       <Tabs defaultValue="recent" className="w-full">
-        <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex">
+        <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex bg-muted/80">
           <TabsTrigger value="recent">Recent Tests</TabsTrigger>
           <TabsTrigger value="failed">Failed Tests</TabsTrigger>
           <TabsTrigger value="flaky">Flaky Tests</TabsTrigger>
@@ -34,11 +41,11 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
 
         {/* Recent Tests Tab */}
         <TabsContent value="recent" className="mt-3">
-          <Card>
-            <CardHeader className="pb-0">
+          <Card className="border border-amber-100">
+            <CardHeader className="pb-0 bg-gradient-to-r from-amber-50 to-white">
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Recent Test Results</CardTitle>
+                  <CardTitle className="text-slate-800">Recent Test Results</CardTitle>
                   <CardDescription>Latest 5 test executions</CardDescription>
                 </div>
                 <Button
@@ -55,18 +62,18 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
               "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2",
               visibleTables.recent ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
             )}>
-              <TestResultsList tests={testResults.slice(-5).reverse()} />
+              <TestResultsList tests={displayedResults} />
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Failed Tests Tab */}
         <TabsContent value="failed" className="mt-3">
-          <Card>
-            <CardHeader className="pb-0">
+          <Card className="border border-red-100">
+            <CardHeader className="pb-0 bg-gradient-to-r from-red-50 to-white">
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Failed Tests</CardTitle>
+                  <CardTitle className="text-slate-800">Failed Tests</CardTitle>
                   <CardDescription>Tests that did not pass</CardDescription>
                 </div>
                 <Button
@@ -90,11 +97,11 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
 
         {/* Flaky Tests Tab */}
         <TabsContent value="flaky" className="mt-3">
-          <Card>
-            <CardHeader className="pb-0">
+          <Card className="border border-amber-200">
+            <CardHeader className="pb-0 bg-gradient-to-r from-amber-50 to-white">
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Flaky Tests</CardTitle>
+                  <CardTitle className="text-slate-800">Flaky Tests</CardTitle>
                   <CardDescription>Tests with inconsistent results</CardDescription>
                 </div>
                 <Button

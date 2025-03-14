@@ -26,9 +26,9 @@ export const UploadHistory = ({ uploads }: UploadHistoryProps) => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-2">
-        <CardTitle>Upload History</CardTitle>
+    <Card className="w-full border border-amber-100">
+      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+        <CardTitle className="text-slate-800">Upload History</CardTitle>
         <CardDescription>Recent test report uploads</CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
@@ -42,13 +42,13 @@ export const UploadHistory = ({ uploads }: UploadHistoryProps) => {
               uploads.map((upload) => (
                 <div
                   key={upload.id}
-                  className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0"
+                  className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0 hover:bg-amber-50/30 transition-colors rounded-md p-2"
                 >
-                  <div className="rounded-full p-1.5 bg-blue-50">
-                    <FileText className="h-3.5 w-3.5 text-blue-500" />
+                  <div className="rounded-full p-1.5 bg-amber-100">
+                    <FileText className="h-3.5 w-3.5 text-amber-600" />
                   </div>
                   <div className="flex-1 space-y-0.5">
-                    <p className="text-sm font-medium">{upload.filename}</p>
+                    <p className="text-sm font-medium text-slate-800">{upload.filename}</p>
                     <div className="flex items-center space-x-2">
                       <Clock className="h-3 w-3 text-gray-400" />
                       <p className="text-xs text-gray-500">

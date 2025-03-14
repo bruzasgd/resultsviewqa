@@ -1,6 +1,6 @@
 
 import { SuccessRateChart } from "@/components/dashboard/SuccessRateChart";
-import { ParsedTestResult } from "@/lib/xmlParser";
+import { type ParsedTestResult } from "@/lib/xmlParser";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Bar, 
@@ -26,11 +26,11 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
   // Get daily stats for the bar chart
   const dailyStats = getTestResultsStatsByDate();
   
-  // Custom colors for the bars
+  // Custom colors for the bars - using the theme colors from the image
   const colors = {
     passed: "#10b981",
     failed: "#ef4444",
-    flaky: "#f59e0b"
+    flaky: "#f7cc4d" // Changed to amber/yellow to match the theme
   };
 
   // Format date for better readability
@@ -56,9 +56,9 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
       />
       
       {/* Daily Upload Stats */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Daily Test Results</CardTitle>
+      <Card className="border border-amber-100">
+        <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+          <CardTitle className="text-slate-800">Daily Test Results</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] pt-2">
           <ResponsiveContainer width="100%" height="100%">
@@ -68,20 +68,20 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
                 formattedDate: formatDate(item.date)
               }))}
               margin={{ top: 10, right: 20, left: 5, bottom: 35 }}
-              barGap={2}
-              barSize={16}
+              barGap={4}
+              barSize={18}
             >
               <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
               <XAxis 
                 dataKey="formattedDate" 
                 angle={0} 
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: "#1e293b" }}
                 height={40}
                 tickMargin={5}
               />
               <YAxis 
                 tickFormatter={(value) => value === 0 ? '0' : value}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: "#1e293b" }}
                 width={25}
               />
               <Tooltip 
@@ -97,7 +97,8 @@ export const ChartsRow = ({ testResults }: ChartsRowProps) => {
                   borderRadius: '6px',
                   padding: '8px 10px',
                   fontSize: '12px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  borderColor: "#f7cc4d"
                 }}
               />
               <Legend 

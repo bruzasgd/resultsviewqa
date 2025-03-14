@@ -1,4 +1,3 @@
-
 import { Calendar, Upload, RefreshCw, AlertCircle, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -143,12 +142,12 @@ export const DashboardHeader = ({
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
+        <h1 className="text-3xl font-bold text-slate-800">{title}</h1>
         <p className="text-muted-foreground mt-1">{description}</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] border-amber-200">
             <Calendar className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Time Period" />
           </SelectTrigger>
@@ -161,7 +160,7 @@ export const DashboardHeader = ({
           </SelectContent>
         </Select>
         
-        <Button variant="outline" onClick={onRefresh}>
+        <Button variant="outline" onClick={onRefresh} className="border-amber-200 hover:bg-amber-50 hover:text-amber-700">
           <RefreshCw className={`mr-2 h-4 w-4 ${isUploading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
@@ -177,7 +176,7 @@ export const DashboardHeader = ({
           <Button 
             onClick={() => fileInputRef.current?.click()} 
             disabled={isUploading}
-            className="w-full sm:w-auto relative overflow-hidden"
+            className="w-full sm:w-auto relative overflow-hidden bg-amber-500 hover:bg-amber-600 text-white"
           >
             <Upload className="mr-2 h-4 w-4" />
             {isUploading ? 'Uploading...' : 'Upload Report'}
@@ -193,9 +192,9 @@ export const DashboardHeader = ({
       
       {/* Duplicate Upload Dialog */}
       <AlertDialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-amber-200">
           <AlertDialogHeader>
-            <AlertDialogTitle>Duplicate Report Detected</AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-800">Duplicate Report Detected</AlertDialogTitle>
             <AlertDialogDescription>
               This report appears to have been uploaded before. Do you want to upload it again?
             </AlertDialogDescription>
@@ -204,7 +203,7 @@ export const DashboardHeader = ({
             <AlertDialogCancel onClick={() => {
               setShowDuplicateDialog(false);
               setPendingUpload(null);
-            }}>
+            }} className="border-amber-200 hover:bg-amber-50 hover:text-amber-700">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={async () => {
@@ -217,7 +216,7 @@ export const DashboardHeader = ({
               }
               setShowDuplicateDialog(false);
               setPendingUpload(null);
-            }}>
+            }} className="bg-amber-500 hover:bg-amber-600 text-white">
               Upload Anyway
             </AlertDialogAction>
           </AlertDialogFooter>

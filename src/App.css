@@ -44,6 +44,8 @@
 /* Theme colors from the provided image */
 :root {
   --theme-yellow: #f7cc4d;
+  --theme-amber: #fdba74;
+  --theme-light-amber: #fef3c7;
   --theme-black: #000000;
   --theme-background: #fffdf7;
   --theme-text: #1e293b;
@@ -77,4 +79,41 @@
 .theme-button-secondary:hover {
   border-color: var(--theme-yellow);
   color: var(--theme-black);
+}
+
+/* Custom scrollbar for the application */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #f7cc4d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #f59e0b;
+}
+
+/* Custom animation for cards */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(247, 204, 77, 0.15);
+}
+
+/* Custom styles for tabs */
+[data-state="active"].tab-amber {
+  background-color: #fef3c7;
+  color: #92400e;
+  font-weight: 500;
 }

@@ -14,35 +14,38 @@ export const SuccessRateChart = ({ passedCount, failedCount, flakyCount }: Succe
     {
       metric: "Passed",
       value: passedCount,
-      color: "hsl(142, 76%, 36%)"
+      color: "#10b981" // Keep green for passed tests
     },
     {
       metric: "Failed",
       value: failedCount,
-      color: "hsl(346, 87%, 43%)"
+      color: "#ef4444" // Keep red for failed tests
     },
     {
       metric: "Flaky",
       value: flakyCount,
-      color: "hsl(41, 88%, 64%)"
+      color: "#f7cc4d" // Theme yellow for flaky tests
     }
   ];
 
   return (
-    <Card className="lg:col-span-2">
-      <CardHeader>
-        <CardTitle>Success Rate</CardTitle>
+    <Card className="border border-amber-100">
+      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+        <CardTitle className="text-slate-800">Success Rate</CardTitle>
         <CardDescription>Distribution of test results by status</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="h-80">
+      <CardContent className="h-[300px] pt-2">
+        <div className="h-[280px]">
           <ResponsiveBar
             data={successRateData}
             keys={["value"]}
             indexBy="metric"
-            margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
+            margin={{ top: 30, right: 30, bottom: 50, left: 60 }}
             padding={0.3}
             colors={({ data }) => data.color}
+            borderRadius={4}
+            borderWidth={1}
+            borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
             axisBottom={{
               tickSize: 5,
               tickPadding: 5,
@@ -67,8 +70,23 @@ export const SuccessRateChart = ({ passedCount, failedCount, flakyCount }: Succe
                   borderRadius: "6px",
                   boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                   padding: "12px 16px",
+                  borderColor: "#f7cc4d"
                 },
               },
+              axis: {
+                ticks: {
+                  text: {
+                    fontSize: 11,
+                    fill: "#1e293b"
+                  }
+                },
+                legend: {
+                  text: {
+                    fontSize: 11,
+                    fill: "#1e293b"
+                  }
+                }
+              }
             }}
           />
         </div>

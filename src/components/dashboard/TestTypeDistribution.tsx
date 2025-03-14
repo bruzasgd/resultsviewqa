@@ -25,10 +25,13 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
     }));
   })();
 
+  // Custom color array starting with our theme amber color
+  const customColors = ["#f7cc4d", "#f59e0b", "#d97706", "#92400e", "#78350f"];
+
   return (
-    <Card className={cn(className)}>
-      <CardHeader className="pb-2">
-        <CardTitle>Test Type Distribution</CardTitle>
+    <Card className={cn(className, "border border-amber-100")}>
+      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+        <CardTitle className="text-slate-800">Test Type Distribution</CardTitle>
         <CardDescription>Tests by framework</CardDescription>
       </CardHeader>
       <CardContent className="h-[300px] pt-2">
@@ -38,14 +41,16 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
           innerRadius={0.5}
           padAngle={0.7}
           cornerRadius={3}
-          colors={{ scheme: "category10" }}
+          colors={customColors}
           borderWidth={1}
           borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
           arcLabelsSkipAngle={10}
-          arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-          arcLinkLabelsOffset={0}
+          arcLabelsTextColor="#ffffff"
+          arcLabelsRadiusOffset={0.6}
+          arcLinkLabelsOffset={2}
           arcLinkLabelsTextColor="#333333"
-          arcLinkLabelsDiagonalLength={12}
+          arcLinkLabelsDiagonalLength={16}
+          arcLinkLabelsStraightLength={8}
           arcLinkLabelsThickness={2}
           arcLinkLabelsColor={{ from: "color" }}
           animate={true}
@@ -59,7 +64,7 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
               itemsSpacing: 0,
               itemWidth: 80,
               itemHeight: 16,
-              itemTextColor: "#999",
+              itemTextColor: "#666",
               itemDirection: "left-to-right",
               itemOpacity: 1,
               symbolSize: 12,
@@ -74,11 +79,13 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
                 borderRadius: "6px",
                 boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                 padding: "10px 12px",
+                borderColor: "#f7cc4d"
               },
             },
             labels: {
               text: {
-                fontSize: 11
+                fontSize: 11,
+                fontWeight: 500
               }
             },
             legends: {

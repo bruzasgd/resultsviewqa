@@ -7,14 +7,15 @@ import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { UploadHistory } from "./UploadHistory";
-import { useUploadHistory } from "@/services/uploadHistoryService";
+import { UploadHistory, UploadRecord } from "./UploadHistory";
 
 interface TestResultsTabsProps {
   testResults: ParsedTestResult[];
+  uploads?: UploadRecord[];
+  onRemoveUpload?: (id: string) => void;
 }
 
-export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
+export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: TestResultsTabsProps) => {
   const [visibleTables, setVisibleTables] = useState({
     recent: true,
     failed: true,
@@ -25,7 +26,6 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
   const [displayedResults, setDisplayedResults] = useState<ParsedTestResult[]>([]);
   const [failedResults, setFailedResults] = useState<ParsedTestResult[]>([]);
   const [flakyResults, setFlakyResults] = useState<ParsedTestResult[]>([]);
-  const { uploads } = useUploadHistory();
   
   // Update displayed results whenever testResults prop changes
   useEffect(() => {
@@ -67,7 +67,7 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setVisibleTables(prev => ({ ...prev, recent: !prev.recent }))}
-                  className="flex items-center gap-1 h-8 hover:bg-amber-100 hover:text-amber-700"
+                  className="flex items-center gap-1 h-8 hover:bg-amber-50 hover:text-amber-700"
                 >
                   {visibleTables.recent ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -140,7 +140,7 @@ export const TestResultsTabs = ({ testResults }: TestResultsTabsProps) => {
       </Tabs>
 
       {/* Upload History */}
-      <UploadHistory uploads={uploads} />
+      <UploadHistory uploads={uploads} onRemoveUpload={onRemoveUpload} />
     </div>
   );
 };

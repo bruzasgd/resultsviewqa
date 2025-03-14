@@ -2,10 +2,42 @@
 import { toast } from "@/components/ui/use-toast";
 import { parseTestXML, ParsedTestResult } from "@/lib/xmlParser";
 import { uploadTestReportAPI, getTestResultsAPI } from "@/lib/apiSimulator";
+import { useUploadHistory } from "@/services/uploadHistoryService";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-// For simplicity, we'll store test results in memory
-// In a real app, this would be stored in a database
-let testResults: ParsedTestResult[] = [];
+// Store to handle test results with persistence
+interface TestResultsState {
+  results: ParsedTestResult[];
+  addResults: (newResults: ParsedTestResult[]) => void;
+  removeResultsByUploadId: (uploadId: string) => void;
+  clearAllResults: () => void;
+}
+
+export const useTestResults = create<TestResultsState>()(
+  persist(
+    (set) => ({
+      results: [],
+      addResults: (newResults) => {
+        set((state) => ({
+          results: [...newResults, ...state.results]
+        }));
+      },
+      removeResultsByUploadId: (uploadId) => {
+        set((state) => ({
+          results: state.results.filter(result => result.uploadId !== uploadId)
+        }));
+      },
+      clearAllResults: () => {
+        set({ results: [] });
+      }
+    }),
+    {
+      name: 'test-results-storage',
+      skipHydration: false,
+    }
+  )
+);
 
 // Event listeners for state updates
 type TestResultsListener = () => void;
@@ -45,6 +77,9 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
 
     console.log("XML validation passed, parsing test results...");
     
+    // Generate a unique upload ID
+    const uploadId = crypto.randomUUID();
+    
     // Parse the XML and validate test results - use try/catch to make this more robust
     let parsedResults: ParsedTestResult[] = [];
     try {
@@ -60,12 +95,11 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
     
     console.log(`Successfully parsed ${parsedResults.length} test results`);
     
-    // Add filename if provided
-    if (filename) {
-      parsedResults.forEach(result => {
-        result.filename = filename;
-      });
-    }
+    // Add filename and uploadId if provided
+    parsedResults.forEach(result => {
+      if (filename) result.filename = filename;
+      result.uploadId = uploadId;
+    });
     
     // Simulate API call to upload the test report
     const response = await uploadTestReportAPI(xmlString);
@@ -74,8 +108,8 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
       throw new Error(response.error || "Failed to upload test report");
     }
     
-    // Update the test results with new data - prepend new results
-    testResults = [...parsedResults, ...testResults];
+    // Add results to persistent store
+    useTestResults.getState().addResults(parsedResults);
     
     // Notify all subscribers about the state change
     notifyListeners();
@@ -100,20 +134,26 @@ export const getAllTestResults = async (): Promise<ParsedTestResult[]> => {
       throw new Error(response.error || "Failed to fetch test results");
     }
     
-    // In a real app, this would return data from the API response
-    // For this demo, we're using our in-memory storage
-    return testResults;
+    // Return results from persistent store
+    return useTestResults.getState().results;
   } catch (error) {
     console.error("Error fetching test results:", error);
-    return testResults; // Fallback to local data on error
+    return useTestResults.getState().results; // Fallback to local data on error
   }
+};
+
+// Remove results for a specific upload
+export const removeResultsByUploadId = (uploadId: string): void => {
+  useTestResults.getState().removeResultsByUploadId(uploadId);
+  notifyListeners();
 };
 
 // Get results grouped by date
 export const getResultsByDate = (): Record<string, ParsedTestResult[]> => {
   const resultsByDate: Record<string, ParsedTestResult[]> = {};
+  const results = useTestResults.getState().results;
   
-  testResults.forEach(result => {
+  results.forEach(result => {
     const date = result.uploadDate 
       ? result.uploadDate.toISOString().split('T')[0] 
       : new Date().toISOString().split('T')[0];
@@ -132,8 +172,9 @@ export const getResultsByDate = (): Record<string, ParsedTestResult[]> => {
 export const getResultsForLastNDays = (days: number): ParsedTestResult[] => {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
+  const results = useTestResults.getState().results;
   
-  return testResults.filter(result => {
+  return results.filter(result => {
     const resultDate = result.uploadDate || new Date();
     return resultDate >= cutoffDate;
   });
@@ -141,7 +182,7 @@ export const getResultsForLastNDays = (days: number): ParsedTestResult[] => {
 
 // Clear all test results
 export const clearTestResults = (): void => {
-  testResults = [];
+  useTestResults.getState().clearAllResults();
   notifyListeners();
 };
 
@@ -172,12 +213,19 @@ export const getTestResultsStatsByDate = (): {
 
 // Initialize with some data (for demo purposes)
 export const initializeWithMockData = (mockData: ParsedTestResult[]): void => {
-  // Add upload date if not present
+  // Skip if we already have data
+  if (useTestResults.getState().results.length > 0) {
+    console.log("Skipping mock data initialization since there's already data");
+    return;
+  }
+  
+  // Add upload date and ID if not present
   const dataWithDates = mockData.map(item => ({
     ...item,
-    uploadDate: item.uploadDate || new Date()
+    uploadDate: item.uploadDate || new Date(),
+    uploadId: item.uploadId || crypto.randomUUID()
   }));
   
-  testResults = [...dataWithDates];
+  useTestResults.getState().addResults(dataWithDates);
   notifyListeners();
 };

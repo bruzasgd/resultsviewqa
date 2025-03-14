@@ -7,15 +7,17 @@ import { ChartsSecondRow } from "@/components/dashboard/ChartsSecondRow";
 import { TestResultsTabs } from "@/components/dashboard/TestResultsTabs";
 import { ApiDocumentation } from "@/components/dashboard/ApiDocumentation";
 import { mockTestData } from "@/data/mockTestData";
-import { getAllTestResults, initializeWithMockData, subscribeToTestResults, getResultsForLastNDays } from "@/services/testReportService";
+import { getAllTestResults, initializeWithMockData, subscribeToTestResults, getResultsForLastNDays, removeResultsByUploadId } from "@/services/testReportService";
 import { ParsedTestResult } from "@/lib/xmlParser";
 import { toast } from "@/components/ui/use-toast";
+import { useUploadHistory } from "@/services/uploadHistoryService";
 
 const Dashboard = () => {
   const [testResults, setTestResults] = useState<ParsedTestResult[]>([]);
   const [filteredResults, setFilteredResults] = useState<ParsedTestResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState("7days");
+  const { uploads, removeUpload } = useUploadHistory();
 
   const refreshTestResults = useCallback(async () => {
     setLoading(true);
@@ -86,6 +88,17 @@ const Dashboard = () => {
     setTimePeriod(value);
   };
 
+  const handleRemoveUpload = (id: string) => {
+    // Remove from upload history
+    removeUpload(id);
+    
+    // Remove associated test results
+    removeResultsByUploadId(id);
+    
+    // Refresh the dashboard
+    refreshTestResults();
+  };
+
   // Calculate metrics and trends based on filtered results
   const calculateMetrics = () => {
     const currentPassRate = filteredResults.length > 0
@@ -134,7 +147,11 @@ const Dashboard = () => {
       
       <ChartsSecondRow testResults={filteredResults} />
 
-      <TestResultsTabs testResults={filteredResults} />
+      <TestResultsTabs 
+        testResults={filteredResults} 
+        uploads={uploads}
+        onRemoveUpload={handleRemoveUpload}
+      />
 
       <ApiDocumentation />
     </div>

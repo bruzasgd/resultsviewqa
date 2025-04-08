@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Clock, Trash2, XCircle } from "lucide-react";
@@ -35,13 +34,23 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
+    try {
+      // Ensure we have a valid date object
+      if (!(date instanceof Date) || isNaN(date.getTime())) {
+        return "Invalid date";
+      }
+      
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid date";
+    }
   };
 
   const toggleSelection = (id: string) => {

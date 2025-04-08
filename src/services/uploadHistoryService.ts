@@ -18,6 +18,32 @@ interface UploadHistoryState {
   clearAllUploads: () => void;
 }
 
+// Custom storage handler to ensure proper Date object serialization/deserialization
+const customStorage = {
+  getItem: (name: string) => {
+    const str = localStorage.getItem(name);
+    if (!str) return null;
+    
+    const parsed = JSON.parse(str);
+    
+    // Convert timestamp strings back to Date objects
+    if (parsed.state && parsed.state.uploads) {
+      parsed.state.uploads = parsed.state.uploads.map((upload: any) => ({
+        ...upload,
+        timestamp: new Date(upload.timestamp)
+      }));
+    }
+    
+    return str;
+  },
+  setItem: (name: string, value: string) => {
+    localStorage.setItem(name, value);
+  },
+  removeItem: (name: string) => {
+    localStorage.removeItem(name);
+  }
+};
+
 export const useUploadHistory = create<UploadHistoryState>()(
   persist(
     (set, get) => ({
@@ -47,6 +73,7 @@ export const useUploadHistory = create<UploadHistoryState>()(
     {
       name: 'test-upload-history',
       skipHydration: false,
+      storage: customStorage
     }
   )
 );

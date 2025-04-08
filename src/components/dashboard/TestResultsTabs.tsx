@@ -70,7 +70,7 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full">
         <Tabs defaultValue="recent" className="w-full">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
             <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex bg-blue-100/50 border border-blue-200">
@@ -123,7 +123,9 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
                 "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2 w-full",
                 visibleTables.recent ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
               )}>
-                <TestResultsList tests={displayedResults} />
+                <div className="w-full overflow-x-auto">
+                  <TestResultsList tests={displayedResults} />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -151,7 +153,9 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
                 "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2 w-full",
                 visibleTables.failed ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
               )}>
-                <TestResultsList tests={failedResults} />
+                <div className="w-full overflow-x-auto">
+                  <TestResultsList tests={failedResults} />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -179,7 +183,9 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
                 "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2 w-full",
                 visibleTables.flaky ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
               )}>
-                <TestResultsList tests={flakyResults} />
+                <div className="w-full overflow-x-auto">
+                  <TestResultsList tests={flakyResults} />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

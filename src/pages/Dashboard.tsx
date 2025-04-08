@@ -6,6 +6,7 @@ import { ChartsRow } from "@/components/dashboard/ChartsRow";
 import { ChartsSecondRow } from "@/components/dashboard/ChartsSecondRow";
 import { TestResultsTabs } from "@/components/dashboard/TestResultsTabs";
 import { ApiDocumentation } from "@/components/dashboard/ApiDocumentation";
+import { XmlDocumentation } from "@/components/dashboard/XmlDocumentation";
 import { mockTestData } from "@/data/mockTestData";
 import { getAllTestResults, initializeWithMockData, subscribeToTestResults, getResultsForLastNDays, removeResultsByUploadId } from "@/services/testReportService";
 import { ParsedTestResult } from "@/lib/xmlParser";
@@ -153,6 +154,8 @@ const Dashboard = () => {
         onRemoveUpload={handleRemoveUpload}
       />
 
+      <XmlDocumentation />
+      
       <ApiDocumentation />
     </div>
   );

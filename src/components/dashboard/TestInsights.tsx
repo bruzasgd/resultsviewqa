@@ -9,6 +9,15 @@ interface TestInsightsProps {
 }
 
 export const TestInsights = ({ testResults }: TestInsightsProps) => {
+  // Helper function to safely parse a duration string
+  const parseDuration = (durationStr: string): number => {
+    try {
+      return parseFloat(durationStr.replace('s', ''));
+    } catch (e) {
+      return 0;
+    }
+  };
+
   // Calculate insights
   const calculateInsights = () => {
     if (!testResults.length) {
@@ -32,7 +41,7 @@ export const TestInsights = ({ testResults }: TestInsightsProps) => {
     const slowestTests = Object.values(testGroups)
       .map(tests => {
         const avgDuration = tests.reduce((sum, test) => {
-          return sum + parseFloat(test.duration.replace('s', ''));
+          return sum + parseDuration(test.duration);
         }, 0) / tests.length;
         
         return {

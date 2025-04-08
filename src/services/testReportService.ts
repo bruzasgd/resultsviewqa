@@ -95,10 +95,12 @@ export const uploadTestReport = async (xmlString: string, filename?: string): Pr
     
     console.log(`Successfully parsed ${parsedResults.length} test results`);
     
-    // Add filename and uploadId if provided
+    // Add filename, uploadId, and uploadDate if provided
+    const currentDate = new Date();
     parsedResults.forEach(result => {
       if (filename) result.filename = filename;
       result.uploadId = uploadId;
+      result.uploadDate = currentDate;
     });
     
     // Simulate API call to upload the test report
@@ -154,15 +156,28 @@ export const getResultsByDate = (): Record<string, ParsedTestResult[]> => {
   const results = useTestResults.getState().results;
   
   results.forEach(result => {
-    const date = result.uploadDate 
-      ? result.uploadDate.toISOString().split('T')[0] 
-      : new Date().toISOString().split('T')[0];
+    // Safe handling of uploadDate - could be Date object or string
+    let dateStr: string;
     
-    if (!resultsByDate[date]) {
-      resultsByDate[date] = [];
+    if (!result.uploadDate) {
+      dateStr = new Date().toISOString().split('T')[0];
+    } else if (result.uploadDate instanceof Date) {
+      dateStr = result.uploadDate.toISOString().split('T')[0];
+    } else {
+      // If it's a string, try to parse it or use current date as fallback
+      try {
+        dateStr = new Date(result.uploadDate).toISOString().split('T')[0];
+      } catch (e) {
+        console.error("Invalid date format:", result.uploadDate);
+        dateStr = new Date().toISOString().split('T')[0];
+      }
     }
     
-    resultsByDate[date].push(result);
+    if (!resultsByDate[dateStr]) {
+      resultsByDate[dateStr] = [];
+    }
+    
+    resultsByDate[dateStr].push(result);
   });
   
   return resultsByDate;
@@ -175,7 +190,24 @@ export const getResultsForLastNDays = (days: number): ParsedTestResult[] => {
   const results = useTestResults.getState().results;
   
   return results.filter(result => {
-    const resultDate = result.uploadDate || new Date();
+    if (!result.uploadDate) return true; // Include results with no date
+    
+    let resultDate: Date;
+    
+    if (result.uploadDate instanceof Date) {
+      resultDate = result.uploadDate;
+    } else {
+      // If it's a string, try to parse it
+      try {
+        resultDate = new Date(result.uploadDate);
+        if (isNaN(resultDate.getTime())) {
+          return true; // Include results with invalid dates
+        }
+      } catch (e) {
+        return true; // Include results with unparseable dates
+      }
+    }
+    
     return resultDate >= cutoffDate;
   });
 };

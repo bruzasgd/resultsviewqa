@@ -55,7 +55,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
   };
 
   // Helper function to safely format upload date
-  const formatUploadDate = (date: Date | undefined) => {
+  const formatUploadDate = (date: Date | string | undefined) => {
     if (!date) return 'Unknown';
     
     try {
@@ -66,7 +66,10 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
       
       // If it's a string representation, convert it
       if (typeof date === 'string') {
-        return new Date(date).toLocaleString();
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate.toLocaleString();
+        }
       }
       
       return 'Unknown';

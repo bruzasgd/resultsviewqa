@@ -2,7 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ParsedTestResult } from "@/lib/xmlParser";
-import { Check, X, AlertTriangle, ExternalLink, Clock, Monitor } from "lucide-react";
+import { Check, X, AlertTriangle, ExternalLink, Clock, Monitor, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { 
   Tooltip,
@@ -39,7 +39,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
       case 'failed':
         return <X className="h-4 w-4 text-red-500" />;
       case 'flaky':
-        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+        return <AlertTriangle className="h-4 w-4 text-blue-500" />;
       default:
         return null;
     }
@@ -80,13 +80,14 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
   };
 
   return (
-    <ScrollArea className="h-[400px] rounded-md border border-amber-100/50">
+    <ScrollArea className="h-[400px] rounded-md border border-blue-100/50 w-full">
       <Table>
         <TableHeader className="sticky top-0 bg-background z-10">
-          <TableRow className="bg-amber-50/80">
+          <TableRow className="bg-blue-50/80">
             <TableHead className="w-[50px] text-center">Status</TableHead>
             <TableHead>Test Name</TableHead>
             <TableHead className="w-[100px]">Browser</TableHead>
+            <TableHead className="w-[100px]">Team</TableHead>
             <TableHead className="w-[80px]">Duration</TableHead>
             <TableHead className="w-[160px]">Timestamp</TableHead>
             <TableHead className="text-right w-[80px]">Details</TableHead>
@@ -95,7 +96,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
         <TableBody>
           {tests.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
                 No test results available
               </TableCell>
             </TableRow>
@@ -107,7 +108,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 onOpenChange={() => toggleItem(test.id)}
                 className="w-full"
               >
-                <TableRow className="border-b hover:bg-amber-50/40 transition-colors">
+                <TableRow className="border-b hover:bg-blue-50/40 transition-colors">
                   <TableCell className="py-2 text-center">
                     <TooltipProvider>
                       <Tooltip>
@@ -134,13 +135,23 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                   </TableCell>
                   <TableCell className="py-2">
                     <div className="flex items-center gap-1.5">
-                      <Monitor className="h-3.5 w-3.5 text-amber-500" />
+                      <Monitor className="h-3.5 w-3.5 text-blue-500" />
                       <span className="text-sm">{test.browser}</span>
                     </div>
                   </TableCell>
                   <TableCell className="py-2">
+                    {test.team ? (
+                      <div className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-blue-500" />
+                        <span className="text-sm">{test.team}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Unassigned</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="py-2">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-amber-500" />
+                      <Clock className="h-3.5 w-3.5 text-blue-500" />
                       <span className="text-sm">{test.duration}</span>
                     </div>
                   </TableCell>
@@ -149,7 +160,7 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                   </TableCell>
                   <TableCell className="text-right py-2">
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 px-2 hover:bg-amber-100 hover:text-amber-700">
+                      <Button variant="ghost" size="sm" className="h-7 px-2 hover:bg-blue-100 hover:text-blue-700">
                         <ExternalLink className="h-3.5 w-3.5 mr-1" />
                         {openItems[test.id] ? 'Hide' : 'View'}
                       </Button>
@@ -158,12 +169,12 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                 </TableRow>
                 <CollapsibleContent>
                   <TableRow>
-                    <TableCell colSpan={6} className="bg-amber-50/40 p-0">
+                    <TableCell colSpan={7} className="bg-blue-50/40 p-0">
                       <div className="p-3 space-y-2">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <h4 className="text-xs font-semibold mb-1">Framework</h4>
-                            <Badge variant="outline" className="font-mono text-xs bg-amber-50 text-amber-700 border-amber-200">
+                            <Badge variant="outline" className="font-mono text-xs bg-blue-50 text-blue-700 border-blue-200">
                               {test.framework}
                             </Badge>
                           </div>
@@ -195,18 +206,18 @@ export const TestResultsList = ({ tests }: TestResultsListProps) => {
                         </div>
 
                         {/* Additional test insights */}
-                        <div className="mt-3 border-t border-amber-100 pt-2">
+                        <div className="mt-3 border-t border-blue-100 pt-2">
                           <h4 className="text-xs font-semibold mb-1">Test Insights</h4>
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="bg-amber-50/50 p-2 rounded-md">
+                            <div className="bg-blue-50/50 p-2 rounded-md">
                               <div className="text-xs text-muted-foreground">Frequency</div>
                               <div className="text-sm font-medium">{Math.floor(Math.random() * 20) + 1} runs</div>
                             </div>
-                            <div className="bg-amber-50/50 p-2 rounded-md">
+                            <div className="bg-blue-50/50 p-2 rounded-md">
                               <div className="text-xs text-muted-foreground">Avg. Duration</div>
                               <div className="text-sm font-medium">{(parseFloat(test.duration.replace('s', '')) * 0.9).toFixed(2)}s</div>
                             </div>
-                            <div className="bg-amber-50/50 p-2 rounded-md">
+                            <div className="bg-blue-50/50 p-2 rounded-md">
                               <div className="text-xs text-muted-foreground">Stability</div>
                               <div className="text-sm font-medium">{test.status === 'flaky' ? 'Unstable' : 'Stable'}</div>
                             </div>

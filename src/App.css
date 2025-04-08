@@ -2,7 +2,7 @@
 #root {
   width: 100%;
   min-height: 100vh;
-  background-color: #fffdf7;
+  background-color: #f8fbff;
 }
 
 .logo {
@@ -12,10 +12,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #f7cc4d);
+  filter: drop-shadow(0 0 2em #4295f0);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #f7cc4d);
+  filter: drop-shadow(0 0 2em #4295f0);
 }
 
 @keyframes logo-spin {
@@ -41,20 +41,20 @@
   color: #888;
 }
 
-/* Theme colors from the provided image */
+/* Theme colors from blue theme */
 :root {
-  --theme-yellow: #f7cc4d;
-  --theme-amber: #fdba74;
-  --theme-light-amber: #fef3c7;
-  --theme-black: #000000;
-  --theme-background: #fffdf7;
+  --theme-blue: #4295f0;
+  --theme-light-blue: #c2e2fc;
+  --theme-lighter-blue: #ddeffd;
+  --theme-black: #1c2c54;
+  --theme-background: #f8fbff;
   --theme-text: #1e293b;
 }
 
 /* Button styles to match the image */
 .theme-button-primary {
-  background-color: var(--theme-yellow);
-  color: var(--theme-black);
+  background-color: var(--theme-blue);
+  color: white;
   font-weight: 500;
   border-radius: 9999px;
   padding: 0.5rem 1.5rem;
@@ -77,7 +77,7 @@
 }
 
 .theme-button-secondary:hover {
-  border-color: var(--theme-yellow);
+  border-color: var(--theme-blue);
   color: var(--theme-black);
 }
 
@@ -93,12 +93,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #f7cc4d;
+  background-color: #4295f0;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #f59e0b;
+  background-color: #2b78e4;
 }
 
 /* Custom animation for cards */
@@ -108,12 +108,12 @@
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(247, 204, 77, 0.15);
+  box-shadow: 0 4px 12px rgba(66, 149, 240, 0.15);
 }
 
 /* Custom styles for tabs */
-[data-state="active"].tab-amber {
-  background-color: #fef3c7;
-  color: #92400e;
+[data-state="active"].tab-blue {
+  background-color: #ddeffd;
+  color: #1c2c54;
   font-weight: 500;
 }

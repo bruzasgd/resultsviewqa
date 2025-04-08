@@ -39,6 +39,11 @@ export const parsePlaywrightXML = (xmlString: string): ParsedTestResult[] => {
       const browser = testsuite?.getAttribute('hostname') || 'Unknown';
       const timestamp = testsuite?.getAttribute('timestamp') || new Date().toISOString();
       const suite = testsuite?.getAttribute('name') || '';
+      
+      // Extract team information (if available) from metadata attributes or custom properties
+      const team = testsuite?.getAttribute('team') || 
+                  testcase.getAttribute('team') || 
+                  'Frontend'; // Default team if not specified
 
       results.push({
         id: `pw-${index + 1}-${Date.now()}`,
@@ -50,6 +55,7 @@ export const parsePlaywrightXML = (xmlString: string): ParsedTestResult[] => {
         browser,
         suite,
         uploadDate,
+        team,
         ...(errorMessage && { errorMessage })
       });
     });

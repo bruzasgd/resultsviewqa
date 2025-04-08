@@ -117,3 +117,13 @@
   color: #1c2c54;
   font-weight: 500;
 }
+
+/* Fix for table alignment */
+.w-full {
+  width: 100% !important;
+}
+
+.test-results-table {
+  width: 100% !important;
+  min-width: 100%;
+}

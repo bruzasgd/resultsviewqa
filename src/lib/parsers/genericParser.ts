@@ -32,6 +32,19 @@ export const parseGenericXML = (xmlString: string): ParsedTestResult[] => {
           errorMessage = failures[0].textContent || 'Unknown error';
         }
         
+        // Assign a default team based on maybe classname attribute
+        const className = testcase.getAttribute('classname') || '';
+        let team = 'Backend';
+        
+        // Try to infer team from classname if available
+        if (className.toLowerCase().includes('ui') || className.toLowerCase().includes('frontend')) {
+          team = 'Frontend';
+        } else if (className.toLowerCase().includes('api') || className.toLowerCase().includes('backend')) {
+          team = 'Backend';
+        } else if (className.toLowerCase().includes('e2e') || className.toLowerCase().includes('integration')) {
+          team = 'QA';
+        }
+        
         results.push({
           id: `test-${++testIndex}-${Date.now()}`,
           name: testcase.getAttribute('name') || testcase.getAttribute('classname') || `Test ${testIndex}`,
@@ -40,6 +53,7 @@ export const parseGenericXML = (xmlString: string): ParsedTestResult[] => {
           timestamp: new Date().toISOString(),
           framework: 'Unknown',
           browser: 'Unknown',
+          team,
           uploadDate,
           ...(errorMessage && { errorMessage })
         });
@@ -49,6 +63,19 @@ export const parseGenericXML = (xmlString: string): ParsedTestResult[] => {
         const browser = testsuite.getAttribute('hostname') || 'Unknown';
         const timestamp = testsuite.getAttribute('timestamp') || new Date().toISOString();
         const suite = testsuite.getAttribute('name') || '';
+        
+        // Try to derive team from testsuite name/package
+        const suiteName = suite.toLowerCase();
+        let team = testsuite.getAttribute('team') || 'Backend';
+        
+        // Infer team based on suite naming conventions
+        if (suiteName.includes('ui') || suiteName.includes('frontend')) {
+          team = 'Frontend';
+        } else if (suiteName.includes('api') || suiteName.includes('backend')) {
+          team = 'Backend';
+        } else if (suiteName.includes('e2e') || suiteName.includes('integration')) {
+          team = 'QA';
+        }
         
         const testcases = testsuite.querySelectorAll('testcase');
         testcases.forEach(testcase => {
@@ -66,6 +93,9 @@ export const parseGenericXML = (xmlString: string): ParsedTestResult[] => {
             status = 'flaky';
           }
           
+          // Allow individual test cases to override the team setting
+          const testTeam = testcase.getAttribute('team') || team;
+          
           results.push({
             id: `test-${++testIndex}-${Date.now()}`,
             name: testcase.getAttribute('name') || testcase.getAttribute('classname') || `Test ${testIndex}`,
@@ -75,6 +105,7 @@ export const parseGenericXML = (xmlString: string): ParsedTestResult[] => {
             framework: testsuite.getAttribute('name')?.split('.')[0] || 'Unknown',
             browser,
             suite,
+            team: testTeam,
             uploadDate,
             ...(errorMessage && { errorMessage })
           });

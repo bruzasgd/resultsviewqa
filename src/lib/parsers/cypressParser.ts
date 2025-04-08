@@ -30,6 +30,11 @@ export const parseCypressXML = (xmlString: string): ParsedTestResult[] => {
       const timestamp = testsuite?.getAttribute('timestamp') || new Date().toISOString();
       const suite = testsuite?.getAttribute('name') || '';
       
+      // Extract team information (if available) from metadata attributes or custom properties
+      const team = testsuite?.getAttribute('team') || 
+                  testcase.getAttribute('team') || 
+                  'QA'; // Default team if not specified
+      
       results.push({
         id: `cy-${index + 1}-${Date.now()}`,
         name: testcase.getAttribute('name') || `Test ${index + 1}`,
@@ -40,6 +45,7 @@ export const parseCypressXML = (xmlString: string): ParsedTestResult[] => {
         browser,
         suite,
         uploadDate,
+        team,
         ...(errorMessage && { errorMessage })
       });
     });

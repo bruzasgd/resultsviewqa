@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TestResultsList } from "@/components/dashboard/TestResultsList";
@@ -23,16 +22,13 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
     flaky: true
   });
   
-  // For real-time updates of test results
   const [displayedResults, setDisplayedResults] = useState<ParsedTestResult[]>([]);
   const [failedResults, setFailedResults] = useState<ParsedTestResult[]>([]);
   const [flakyResults, setFlakyResults] = useState<ParsedTestResult[]>([]);
   
-  // Team filtering
   const [selectedTeam, setSelectedTeam] = useState<string>("all");
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   
-  // Extract teams from test results
   useEffect(() => {
     if (testResults.length > 0) {
       const teams = new Set<string>();
@@ -45,15 +41,12 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
     }
   }, [testResults]);
   
-  // Update displayed results whenever testResults prop or team filter changes
   useEffect(() => {
     if (testResults.length > 0) {
-      // Apply team filter if needed
       const filteredByTeam = selectedTeam === "all" 
         ? testResults 
         : testResults.filter(test => test.team === selectedTeam);
       
-      // Sort by timestamp, newest first
       const sortedResults = [...filteredByTeam].sort((a, b) => 
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
@@ -100,9 +93,8 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
             )}
           </div>
 
-          {/* Recent Tests Tab */}
           <TabsContent value="recent" className="mt-3 w-full">
-            <Card className="border border-blue-200 w-full">
+            <Card className="border border-blue-200 w-full h-[350px]">
               <CardHeader className="pb-0 bg-gradient-to-r from-blue-50 to-white">
                 <div className="flex justify-between items-center">
                   <div>
@@ -121,7 +113,7 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
               </CardHeader>
               <CardContent className={cn(
                 "transition-all duration-300 ease-in-out overflow-hidden px-3 pt-2 w-full",
-                visibleTables.recent ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 py-0"
+                visibleTables.recent ? "max-h-[250px] opacity-100" : "max-h-0 opacity-0 py-0"
               )}>
                 <div className="w-full overflow-x-auto">
                   <TestResultsList tests={displayedResults} />
@@ -130,7 +122,6 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
             </Card>
           </TabsContent>
 
-          {/* Failed Tests Tab */}
           <TabsContent value="failed" className="mt-3">
             <Card className="border border-red-100">
               <CardHeader className="pb-0 bg-gradient-to-r from-red-50 to-white">
@@ -160,7 +151,6 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
             </Card>
           </TabsContent>
 
-          {/* Flaky Tests Tab */}
           <TabsContent value="flaky" className="mt-3">
             <Card className="border border-blue-200">
               <CardHeader className="pb-0 bg-gradient-to-r from-blue-50 to-white">
@@ -192,7 +182,6 @@ export const TestResultsTabs = ({ testResults, uploads = [], onRemoveUpload }: T
         </Tabs>
       </div>
 
-      {/* Upload History */}
       <UploadHistory uploads={uploads} onRemoveUpload={onRemoveUpload} />
     </div>
   );

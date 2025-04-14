@@ -98,9 +98,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
       <Card className="w-full border border-blue-100">
         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-white">
           <HistoryHeader
-            is
-
-SelectionMode={isSelectionMode}
+            isSelectionMode={isSelectionMode}
             selectedCount={getSelectedCount()}
             onClearSelection={handleClearSelectionMode}
             onEnterSelectionMode={() => setIsSelectionMode(true)}

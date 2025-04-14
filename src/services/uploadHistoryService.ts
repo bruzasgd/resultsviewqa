@@ -34,7 +34,7 @@ const customStorage = {
       }));
     }
     
-    return str;
+    return JSON.stringify(parsed);
   },
   setItem: (name: string, value: string) => {
     localStorage.setItem(name, value);

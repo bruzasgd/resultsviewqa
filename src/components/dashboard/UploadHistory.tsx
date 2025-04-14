@@ -1,19 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Clock, Trash2, XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { removeResultsByUploadId } from "@/services/testReportService";
 import { toast } from "@/components/ui/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { UploadItem } from "./upload-history/UploadItem";
+import { DeleteConfirmDialog } from "./upload-history/DeleteConfirmDialog";
+import { HistoryHeader } from "./upload-history/HistoryHeader";
 
 export interface UploadRecord {
   id: string;
@@ -104,48 +97,16 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
     <>
       <Card className="w-full border border-blue-100">
         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-white">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-slate-800">Upload History</CardTitle>
-              <CardDescription>Recent test report uploads</CardDescription>
-            </div>
-            <div className="flex gap-2">
-              {isSelectionMode ? (
-                <>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="border-blue-200 hover:bg-blue-50 text-slate-700"
-                    onClick={handleClearSelectionMode}
-                  >
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Cancel
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
-                    className="bg-red-500 hover:bg-red-600"
-                    onClick={handleDeleteSelected}
-                    disabled={getSelectedCount() === 0}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete ({getSelectedCount()})
-                  </Button>
-                </>
-              ) : (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-blue-200 hover:bg-blue-50 text-slate-700"
-                  onClick={() => setIsSelectionMode(true)}
-                  disabled={uploads.length === 0}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Clear History
-                </Button>
-              )}
-            </div>
-          </div>
+          <HistoryHeader
+            is
+
+SelectionMode={isSelectionMode}
+            selectedCount={getSelectedCount()}
+            onClearSelection={handleClearSelectionMode}
+            onEnterSelectionMode={() => setIsSelectionMode(true)}
+            onDeleteSelected={handleDeleteSelected}
+            uploadsExist={uploads.length > 0}
+          />
         </CardHeader>
         <CardContent className="pt-2">
           <ScrollArea className="h-[250px] pr-4">
@@ -156,32 +117,14 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
                 </div>
               ) : (
                 uploads.map((upload) => (
-                  <div
+                  <UploadItem
                     key={upload.id}
-                    className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0 hover:bg-blue-50/30 transition-colors rounded-md p-2"
-                  >
-                    {isSelectionMode && (
-                      <Checkbox 
-                        id={`select-${upload.id}`}
-                        checked={selectedUploads[upload.id] || false}
-                        onCheckedChange={() => toggleSelection(upload.id)}
-                        className="mt-1.5"
-                      />
-                    )}
-                    <div className="rounded-full p-1.5 bg-blue-100">
-                      <FileText className="h-3.5 w-3.5 text-blue-600" />
-                    </div>
-                    <div className="flex-1 space-y-0.5">
-                      <p className="text-sm font-medium text-slate-800">{upload.filename}</p>
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-3 w-3 text-gray-400" />
-                        <p className="text-xs text-gray-500">
-                          {formatDate(upload.timestamp)}
-                        </p>
-                        <span className="text-xs text-gray-400">{upload.fileSize}</span>
-                      </div>
-                    </div>
-                  </div>
+                    upload={upload}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={selectedUploads[upload.id] || false}
+                    onSelect={toggleSelection}
+                    formatDate={formatDate}
+                  />
                 ))
               )}
             </div>
@@ -189,33 +132,12 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
         </CardContent>
       </Card>
 
-      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
-        <DialogContent className="border-blue-200">
-          <DialogHeader>
-            <DialogTitle className="text-slate-800">Confirm Deletion</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete {getSelectedCount()} selected report{getSelectedCount() !== 1 ? 's' : ''}? 
-              This will remove all associated test results and cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsConfirmDialogOpen(false)}
-              className="border-blue-200 hover:bg-blue-50"
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={confirmDelete}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        onConfirm={confirmDelete}
+        selectedCount={getSelectedCount()}
+      />
     </>
   );
 };

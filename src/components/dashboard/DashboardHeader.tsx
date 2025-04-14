@@ -1,21 +1,13 @@
-import { Calendar, Upload, RefreshCw, AlertCircle, FileCheck } from "lucide-react";
+
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { uploadTestReport } from "@/services/testReportService";
 import { toast } from "@/components/ui/use-toast";
 import { useUploadHistory, generateContentHash } from "@/services/uploadHistoryService";
-import { Progress } from "@/components/ui/progress";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { TimePeriodSelect } from "./header/TimePeriodSelect";
+import { FileUploader } from "./header/FileUploader";
+import { DuplicateUploadDialog } from "./header/DuplicateUploadDialog";
 
 interface DashboardHeaderProps {
   title: string;
@@ -34,7 +26,6 @@ export const DashboardHeader = ({
   timePeriod = "7days",
   onTimePeriodChange
 }: DashboardHeaderProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
@@ -52,7 +43,6 @@ export const DashboardHeader = ({
       setIsUploading(true);
       setUploadProgress(10);
       
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 100);
@@ -88,57 +78,23 @@ export const DashboardHeader = ({
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
   };
   
   const processUpload = async (xmlContent: string, filename: string, contentHash: string) => {
     try {
       await uploadTestReport(xmlContent, filename);
-      
-      // Add to upload history
       useUploadHistory.getState().addUpload({
         filename,
         fileSize: `${(xmlContent.length / 1024).toFixed(0)} KB`,
         contentHash
       });
-
-      toast({
-        title: "Success",
-        description: (
-          <div className="flex items-center gap-2">
-            <FileCheck className="h-5 w-5 text-green-500" />
-            <span>Test report uploaded successfully: {filename}</span>
-          </div>
-        ),
-      });
-      
       onReportUploaded?.();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: (
-          <div className="flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
-            <div>
-              <p className="font-medium">Upload failed</p>
-              <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : "Failed to process test report"}</p>
-            </div>
-          </div>
-        ),
-        variant: "destructive",
-      });
+      throw error;
     }
   };
-  
-  const handleTimePeriodChange = (value: string) => {
-    if (onTimePeriodChange) {
-      onTimePeriodChange(value);
-    }
-  };
-  
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
@@ -146,81 +102,46 @@ export const DashboardHeader = ({
         <p className="text-muted-foreground mt-1">{description}</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
-        <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-          <SelectTrigger className="w-[180px] border-blue-200">
-            <Calendar className="mr-2 h-4 w-4" />
-            <SelectValue placeholder="Time Period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="yesterday">Yesterday</SelectItem>
-            <SelectItem value="7days">Last 7 Days</SelectItem>
-            <SelectItem value="30days">Last 30 Days</SelectItem>
-            <SelectItem value="90days">Last 90 Days</SelectItem>
-          </SelectContent>
-        </Select>
+        <TimePeriodSelect 
+          value={timePeriod} 
+          onValueChange={onTimePeriodChange || (() => {})} 
+        />
         
-        <Button variant="outline" onClick={onRefresh} className="border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+        <Button 
+          variant="outline" 
+          onClick={onRefresh} 
+          className="border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+        >
           <RefreshCw className={`mr-2 h-4 w-4 ${isUploading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
         
-        <input
-          type="file"
-          accept=".xml"
-          onChange={handleUpload}
-          ref={fileInputRef}
-          className="hidden"
+        <FileUploader
+          onFileSelect={handleUpload}
+          isUploading={isUploading}
+          uploadProgress={uploadProgress}
         />
-        <div className="relative flex-1">
-          <Button 
-            onClick={() => fileInputRef.current?.click()} 
-            disabled={isUploading}
-            className="w-full sm:w-auto relative overflow-hidden bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            {isUploading ? 'Uploading...' : 'Upload Report'}
-          </Button>
-          {isUploading && (
-            <Progress 
-              value={uploadProgress} 
-              className="absolute bottom-0 left-0 right-0 h-1 rounded-none" 
-            />
-          )}
-        </div>
       </div>
       
-      <AlertDialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
-        <AlertDialogContent className="border-blue-200">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-slate-800">Duplicate Report Detected</AlertDialogTitle>
-            <AlertDialogDescription>
-              This report appears to have been uploaded before. Do you want to upload it again?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
-              setShowDuplicateDialog(false);
-              setPendingUpload(null);
-            }} className="border-blue-200 hover:bg-blue-50 hover:text-blue-700">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={async () => {
-              if (pendingUpload) {
-                await processUpload(
-                  pendingUpload.xmlContent,
-                  pendingUpload.filename,
-                  pendingUpload.contentHash
-                );
-              }
-              setShowDuplicateDialog(false);
-              setPendingUpload(null);
-            }} className="bg-blue-600 hover:bg-blue-700 text-white">
-              Upload Anyway
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DuplicateUploadDialog
+        open={showDuplicateDialog}
+        onOpenChange={setShowDuplicateDialog}
+        onCancel={() => {
+          setShowDuplicateDialog(false);
+          setPendingUpload(null);
+        }}
+        onConfirm={async () => {
+          if (pendingUpload) {
+            await processUpload(
+              pendingUpload.xmlContent,
+              pendingUpload.filename,
+              pendingUpload.contentHash
+            );
+          }
+          setShowDuplicateDialog(false);
+          setPendingUpload(null);
+        }}
+      />
     </div>
   );
 };

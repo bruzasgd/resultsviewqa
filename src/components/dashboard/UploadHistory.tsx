@@ -35,7 +35,6 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
 
   const formatDate = (date: Date) => {
     try {
-      // Ensure we have a valid date object
       if (!(date instanceof Date) || isNaN(date.getTime())) {
         return "Invalid date";
       }
@@ -103,8 +102,8 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
 
   return (
     <>
-      <Card className="w-full border border-amber-100">
-        <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+      <Card className="w-full border border-blue-100">
+        <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-white">
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-slate-800">Upload History</CardTitle>
@@ -116,7 +115,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="border-amber-200 hover:bg-amber-50 text-slate-700"
+                    className="border-blue-200 hover:bg-blue-50 text-slate-700"
                     onClick={handleClearSelectionMode}
                   >
                     <XCircle className="h-4 w-4 mr-1" />
@@ -137,7 +136,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="border-amber-200 hover:bg-amber-50 text-slate-700"
+                  className="border-blue-200 hover:bg-blue-50 text-slate-700"
                   onClick={() => setIsSelectionMode(true)}
                   disabled={uploads.length === 0}
                 >
@@ -159,7 +158,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
                 uploads.map((upload) => (
                   <div
                     key={upload.id}
-                    className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0 hover:bg-amber-50/30 transition-colors rounded-md p-2"
+                    className="flex items-start space-x-3 border-b border-gray-200 pb-3 last:border-0 hover:bg-blue-50/30 transition-colors rounded-md p-2"
                   >
                     {isSelectionMode && (
                       <Checkbox 
@@ -169,8 +168,8 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
                         className="mt-1.5"
                       />
                     )}
-                    <div className="rounded-full p-1.5 bg-amber-100">
-                      <FileText className="h-3.5 w-3.5 text-amber-600" />
+                    <div className="rounded-full p-1.5 bg-blue-100">
+                      <FileText className="h-3.5 w-3.5 text-blue-600" />
                     </div>
                     <div className="flex-1 space-y-0.5">
                       <p className="text-sm font-medium text-slate-800">{upload.filename}</p>
@@ -191,7 +190,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
       </Card>
 
       <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
-        <DialogContent className="border-amber-200">
+        <DialogContent className="border-blue-200">
           <DialogHeader>
             <DialogTitle className="text-slate-800">Confirm Deletion</DialogTitle>
             <DialogDescription>
@@ -203,7 +202,7 @@ export const UploadHistory = ({ uploads, onRemoveUpload }: UploadHistoryProps) =
             <Button 
               variant="outline" 
               onClick={() => setIsConfirmDialogOpen(false)}
-              className="border-amber-200 hover:bg-amber-50"
+              className="border-blue-200 hover:bg-blue-50"
             >
               Cancel
             </Button>

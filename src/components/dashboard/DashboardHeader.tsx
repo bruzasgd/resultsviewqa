@@ -147,7 +147,7 @@ export const DashboardHeader = ({
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-          <SelectTrigger className="w-[180px] border-amber-200">
+          <SelectTrigger className="w-[180px] border-blue-200">
             <Calendar className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Time Period" />
           </SelectTrigger>
@@ -160,7 +160,7 @@ export const DashboardHeader = ({
           </SelectContent>
         </Select>
         
-        <Button variant="outline" onClick={onRefresh} className="border-amber-200 hover:bg-amber-50 hover:text-amber-700">
+        <Button variant="outline" onClick={onRefresh} className="border-blue-200 hover:bg-blue-50 hover:text-blue-700">
           <RefreshCw className={`mr-2 h-4 w-4 ${isUploading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
@@ -176,7 +176,7 @@ export const DashboardHeader = ({
           <Button 
             onClick={() => fileInputRef.current?.click()} 
             disabled={isUploading}
-            className="w-full sm:w-auto relative overflow-hidden bg-amber-500 hover:bg-amber-600 text-white"
+            className="w-full sm:w-auto relative overflow-hidden bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Upload className="mr-2 h-4 w-4" />
             {isUploading ? 'Uploading...' : 'Upload Report'}
@@ -190,9 +190,8 @@ export const DashboardHeader = ({
         </div>
       </div>
       
-      {/* Duplicate Upload Dialog */}
       <AlertDialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
-        <AlertDialogContent className="border-amber-200">
+        <AlertDialogContent className="border-blue-200">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-800">Duplicate Report Detected</AlertDialogTitle>
             <AlertDialogDescription>
@@ -203,7 +202,7 @@ export const DashboardHeader = ({
             <AlertDialogCancel onClick={() => {
               setShowDuplicateDialog(false);
               setPendingUpload(null);
-            }} className="border-amber-200 hover:bg-amber-50 hover:text-amber-700">
+            }} className="border-blue-200 hover:bg-blue-50 hover:text-blue-700">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={async () => {
@@ -216,7 +215,7 @@ export const DashboardHeader = ({
               }
               setShowDuplicateDialog(false);
               setPendingUpload(null);
-            }} className="bg-amber-500 hover:bg-amber-600 text-white">
+            }} className="bg-blue-600 hover:bg-blue-700 text-white">
               Upload Anyway
             </AlertDialogAction>
           </AlertDialogFooter>

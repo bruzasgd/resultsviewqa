@@ -43,11 +43,11 @@
 
 /* Theme colors from blue theme */
 :root {
-  --theme-blue: #4295f0;
-  --theme-light-blue: #c2e2fc;
-  --theme-lighter-blue: #ddeffd;
-  --theme-black: #1c2c54;
-  --theme-background: #f8fbff;
+  --theme-blue: #1e40af;
+  --theme-light-blue: #93c5fd;
+  --theme-lighter-blue: #dbeafe;
+  --theme-black: #1e293b;
+  --theme-background: #f8fafc;
   --theme-text: #1e293b;
 }
 

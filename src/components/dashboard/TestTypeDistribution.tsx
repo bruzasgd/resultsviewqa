@@ -25,12 +25,12 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
     }));
   })();
 
-  // Custom color array starting with our theme amber color
-  const customColors = ["#f7cc4d", "#f59e0b", "#d97706", "#92400e", "#78350f"];
+  // Custom color array with dark blues
+  const customColors = ["#1e40af", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa"];
 
   return (
-    <Card className={cn(className, "border border-amber-100")}>
-      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+    <Card className={cn(className, "border border-blue-200")}>
+      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-white">
         <CardTitle className="text-slate-800">Test Type Distribution</CardTitle>
         <CardDescription>Tests by framework</CardDescription>
       </CardHeader>
@@ -79,7 +79,7 @@ export const TestTypeDistribution = ({ testResults, className }: TestTypeDistrib
                 borderRadius: "6px",
                 boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                 padding: "10px 12px",
-                borderColor: "#f7cc4d"
+                borderColor: "#1e40af"
               },
             },
             labels: {

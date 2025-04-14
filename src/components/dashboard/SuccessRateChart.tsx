@@ -24,13 +24,13 @@ export const SuccessRateChart = ({ passedCount, failedCount, flakyCount }: Succe
     {
       metric: "Flaky",
       value: flakyCount,
-      color: "#f7cc4d" // Theme yellow for flaky tests
+      color: "#1e40af" // Changed to dark blue for flaky tests
     }
   ];
 
   return (
-    <Card className="border border-amber-100">
-      <CardHeader className="pb-2 bg-gradient-to-r from-amber-50 to-white">
+    <Card className="border border-blue-200">
+      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-white">
         <CardTitle className="text-slate-800">Success Rate</CardTitle>
         <CardDescription>Distribution of test results by status</CardDescription>
       </CardHeader>
@@ -70,7 +70,7 @@ export const SuccessRateChart = ({ passedCount, failedCount, flakyCount }: Succe
                   borderRadius: "6px",
                   boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                   padding: "12px 16px",
-                  borderColor: "#f7cc4d"
+                  borderColor: "#1e40af"
                 },
               },
               axis: {

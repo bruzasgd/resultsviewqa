@@ -1,6 +1,5 @@
-
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, type StorageValue } from 'zustand/middleware';
 
 export interface UploadRecord {
   id: string;
@@ -20,7 +19,7 @@ interface UploadHistoryState {
 
 // Custom storage handler to ensure proper Date object serialization/deserialization
 const customStorage = {
-  getItem: (name: string) => {
+  getItem: (name: string): StorageValue<UploadHistoryState> | null => {
     const str = localStorage.getItem(name);
     if (!str) return null;
     
@@ -34,7 +33,7 @@ const customStorage = {
       }));
     }
     
-    return JSON.stringify(parsed);
+    return parsed;
   },
   setItem: (name: string, value: string) => {
     localStorage.setItem(name, value);

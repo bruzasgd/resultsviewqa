@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist, type StorageValue } from 'zustand/middleware';
 
@@ -35,10 +36,10 @@ const customStorage = {
     
     return parsed;
   },
-  setItem: (name: string, value: string) => {
-    localStorage.setItem(name, value);
+  setItem: (name: string, value: StorageValue<UploadHistoryState>): void => {
+    localStorage.setItem(name, JSON.stringify(value));
   },
-  removeItem: (name: string) => {
+  removeItem: (name: string): void => {
     localStorage.removeItem(name);
   }
 };
